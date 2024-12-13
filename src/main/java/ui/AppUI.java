@@ -34,4 +34,11 @@ public class AppUI {
 //        stage.setScene(mainScene);
 //        stage.setTitle("H2Online - Catalogue");
     }
+    
+    public void showUserSettingsUI() {
+    	UserSettingsUI userSUI = new UserSettingsUI();
+    	Scene userSettingsScene = userSUI.getScene();
+    	stage.setScene(userSettingsScene);
+    	stage.setTitle("H2Online - Parametre utilisateur");
+    }
 }

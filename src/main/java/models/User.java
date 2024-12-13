@@ -31,6 +31,16 @@ public class User {
         this.password = password;
         this.role = role;
     }
+    
+    // Constructeur simplifié pour l'inscription et la validation
+    public User(int id, String firstName, String lastName, String email, String password, String role) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
 
     // Getters et setters
     public int getId() {

@@ -1,5 +1,8 @@
 package ui;
 
+import java.sql.SQLException;
+
+import dao.UserDAO;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,6 +10,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import models.User;
+import tools.PasswordManager;
 
 public class RegisterUI {
     private AppUI appUI;
@@ -30,10 +35,28 @@ public class RegisterUI {
 
         // Actions
         registerButton.setOnAction(e -> {
-            // Appeler une méthode pour ajouter un utilisateur
-            System.out.println("Utilisateur inscrit !");
-            appUI.showLogin(); // Retourner à la connexion après inscription
+            UserDAO userDAO = new UserDAO();
+            try {
+                if (!userDAO.emailExists(emailField.getText())) {
+                    User newUser = new User(
+                        0,
+                        firstNameField.getText(),
+                        lastNameField.getText(),
+                        emailField.getText(),
+                        PasswordManager.hashPassword(passwordField.getText()),
+                        "customer" // Rôle par défaut
+                    );
+                    userDAO.addUser(newUser);
+                    System.out.println("Utilisateur inscrit avec succès !");
+                    appUI.showLogin(); // Retourner à l'écran de connexion
+                } else {
+                    System.out.println("Email déjà utilisé !");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         });
+
 
         // Organisation de la vue
         VBox layout = new VBox(10, title, firstNameField, lastNameField, emailField, passwordField, registerButton);

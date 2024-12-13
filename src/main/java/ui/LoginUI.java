@@ -1,5 +1,8 @@
 package ui;
 
+import java.sql.SQLException;
+
+import dao.UserDAO;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -7,6 +10,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import models.User;
+import tools.SessionManager;
 
 public class LoginUI {
     private AppUI appUI;
@@ -27,15 +32,21 @@ public class LoginUI {
 
         // Actions
         loginButton.setOnAction(e -> {
-            // Appeler la méthode de validation
-            // Simuler une connexion réussie pour tester
-            boolean success = true; // Remplace par une validation réelle
-            if (success) {
-                appUI.showMainUI(); // Naviguer vers l'interface principale
-            } else {
-                System.out.println("Identifiants incorrects !");
+            UserDAO userDAO = new UserDAO();
+            try {
+                User user = userDAO.validateUser(emailField.getText(), passwordField.getText());
+                if (user != null) {
+                    System.out.println("Connexion réussie, bienvenue " + user.getFirstName() + " !");
+                    SessionManager.setCurrentUser(user);
+                    appUI.showUserSettingsUI(); // Passer à l'interface principale
+                } else {
+                    System.out.println("Identifiants incorrects !");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
         });
+
 
         registerButton.setOnAction(e -> appUI.showRegister()); // Naviguer vers la page d'inscription
 
