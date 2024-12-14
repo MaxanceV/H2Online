@@ -20,7 +20,7 @@ public class UserDAO {
 
     // Ajouter un utilisateur
     public void addUser(User user) throws SQLException {
-        String query = "INSERT INTO Users (first_name, last_name, email, phone_number, address, city, postal_code, country, password, role) " +
+        String query = "INSERT INTO users (first_name, last_name, email, phone_number, address, city, postal_code, country, password, role) " +
                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, user.getFirstName());
@@ -40,7 +40,7 @@ public class UserDAO {
     // Récupérer tous les utilisateurs
     public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM Users";
+        String query = "SELECT * FROM users";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
@@ -53,7 +53,7 @@ public class UserDAO {
 
     // Supprimer un utilisateur
     public void deleteUser(int userId) throws SQLException {
-        String query = "DELETE FROM Users WHERE user_id = ?";
+        String query = "DELETE FROM users WHERE user_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, userId);
             stmt.executeUpdate();
@@ -62,7 +62,7 @@ public class UserDAO {
 
     // Récupérer un utilisateur par son ID
     public User getUserById(int userId) throws SQLException {
-        String query = "SELECT * FROM Users WHERE user_id = ?";
+        String query = "SELECT * FROM users WHERE user_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -86,7 +86,7 @@ public class UserDAO {
             throw new IllegalArgumentException("L'email ne peut pas être nul ou vide.");
         }
 
-        String query = "UPDATE Users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, address = ?, city = ?, postal_code = ?, country = ?, password = ?, role = ? WHERE user_id = ?";
+        String query = "UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, address = ?, city = ?, postal_code = ?, country = ?, password = ?, role = ? WHERE user_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             // Champs obligatoires
             stmt.setString(1, user.getFirstName());
@@ -119,7 +119,7 @@ public class UserDAO {
 
     
     private String getCurrentValue(int userId, String column) throws SQLException {
-        String query = "SELECT " + column + " FROM Users WHERE user_id = ?";
+        String query = "SELECT " + column + " FROM users WHERE user_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -139,7 +139,7 @@ public class UserDAO {
         }
 
         // Vérification dans la base de données
-        String query = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        String query = "SELECT COUNT(*) FROM users WHERE email = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -153,7 +153,7 @@ public class UserDAO {
 
 
     public User validateUser(String email, String password) throws SQLException {
-        String query = "SELECT * FROM Users WHERE email = ? AND password = ?";
+        String query = "SELECT * FROM users WHERE email = ? AND password = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, email);
             stmt.setString(2, PasswordManager.hashPassword(password)); // Comparer avec le mot de passe haché

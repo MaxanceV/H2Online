@@ -1,0 +1,34 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: h2online-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root       # Mot de passe root
+      MYSQL_DATABASE: h2online        # Base de données créée automatiquement
+      MYSQL_USER: user                # Utilisateur non root
+      MYSQL_PASSWORD: password        # Mot de passe utilisateur
+    ports:
+      - "3307:3306"                   # Redirection du port MySQL vers 3307
+    volumes:
+      - mysql_data:/var/lib/mysql     # Stockage persistant des données
+    networks:
+      - h2online-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: h2online-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql                 # Nom du service MySQL (doit correspondre au nom du conteneur)
+      PMA_PORT: 3306                  # Port interne de MySQL dans le conteneur
+    ports:
+      - "8080:80"                     # phpMyAdmin accessible sur http://localhost:8080
+    networks:
+      - h2online-network
+
+volumes:
+  mysql_data:
+
+networks:
+  h2online-network:

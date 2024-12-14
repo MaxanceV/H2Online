@@ -1,28 +1,27 @@
 package ui;
 
-import java.sql.SQLException;
-
 import dao.UserDAO;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import models.User;
+import tools.MainLayout;
 import tools.PasswordManager;
 
 public class RegisterUI {
-    private AppUI appUI;
+    private MainLayout mainLayout;
 
-    public RegisterUI(AppUI appUI) {
-        this.appUI = appUI;
+    public RegisterUI(MainLayout mainLayout) {
+        this.mainLayout = mainLayout;
     }
 
-    public Scene getScene() {
+    public VBox getView() {
         // Composants de l'interface
-        Text title = new Text("Inscription");
+        Label title = new Label("Inscription");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
         TextField firstNameField = new TextField();
         firstNameField.setPromptText("Prénom");
         TextField lastNameField = new TextField();
@@ -31,36 +30,95 @@ public class RegisterUI {
         emailField.setPromptText("Email");
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Mot de passe");
-        Button registerButton = new Button("S'inscrire");
+        PasswordField confirmPasswordField = new PasswordField();
+        confirmPasswordField.setPromptText("Confirmer le mot de passe");
 
-        // Actions
+        Button registerButton = new Button("S'inscrire");
+        registerButton.setDisable(true); // Désactivé par défaut
+        Button cancelButton = new Button("Annuler");
+
+        Label errorLabel = new Label();
+        errorLabel.setStyle("-fx-text-fill: red;");
+
+        // Validation dynamique des champs
+        Runnable validateFields = () -> {
+            boolean allFieldsFilled = !firstNameField.getText().isEmpty() &&
+                                      !lastNameField.getText().isEmpty() &&
+                                      !emailField.getText().isEmpty() &&
+                                      !passwordField.getText().isEmpty() &&
+                                      !confirmPasswordField.getText().isEmpty();
+
+            boolean passwordsMatch = passwordField.getText().equals(confirmPasswordField.getText());
+
+            if (allFieldsFilled && passwordsMatch) {
+                registerButton.setDisable(false);
+                errorLabel.setText(""); // Efface les erreurs
+            } else {
+                registerButton.setDisable(true);
+                if (!passwordsMatch) {
+                    errorLabel.setText("Les mots de passe ne correspondent pas.");
+                }
+            }
+        };
+
+        // Ajout des écouteurs pour validation dynamique
+        firstNameField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
+        lastNameField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
+        emailField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
+        passwordField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
+        confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
+
+        // Actions des boutons
         registerButton.setOnAction(e -> {
             UserDAO userDAO = new UserDAO();
             try {
                 if (!userDAO.emailExists(emailField.getText())) {
+                    // Créer un nouvel utilisateur
                     User newUser = new User(
-                        0,
+                        0, // ID auto-incrémenté
                         firstNameField.getText(),
                         lastNameField.getText(),
                         emailField.getText(),
                         PasswordManager.hashPassword(passwordField.getText()),
                         "customer" // Rôle par défaut
                     );
+
                     userDAO.addUser(newUser);
                     System.out.println("Utilisateur inscrit avec succès !");
-                    appUI.showLogin(); // Retourner à l'écran de connexion
+                    mainLayout.setContent(new LoginUI(mainLayout).getView()); // Redirection vers la connexion
                 } else {
-                    System.out.println("Email déjà utilisé !");
+                    errorLabel.setText("Cet email est déjà utilisé !");
                 }
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
+                errorLabel.setText("Erreur lors de l'inscription. Veuillez réessayer.");
             }
         });
 
+        cancelButton.setOnAction(e -> {
+            mainLayout.setContent(new LoginUI(mainLayout).getView()); // Retour à la page de connexion
+        });
 
-        // Organisation de la vue
-        VBox layout = new VBox(10, title, firstNameField, lastNameField, emailField, passwordField, registerButton);
+        // Disposition des éléments
+        GridPane form = new GridPane();
+        form.setAlignment(Pos.CENTER);
+        form.setHgap(10);
+        form.setVgap(10);
+
+        form.add(new Label("Prénom :"), 0, 0);
+        form.add(firstNameField, 1, 0);
+        form.add(new Label("Nom :"), 0, 1);
+        form.add(lastNameField, 1, 1);
+        form.add(new Label("Email :"), 0, 2);
+        form.add(emailField, 1, 2);
+        form.add(new Label("Mot de passe :"), 0, 3);
+        form.add(passwordField, 1, 3);
+        form.add(new Label("Confirmer le mot de passe :"), 0, 4);
+        form.add(confirmPasswordField, 1, 4);
+
+        VBox layout = new VBox(15, title, form, errorLabel, registerButton, cancelButton);
         layout.setAlignment(Pos.CENTER);
-        return new Scene(layout, 400, 400);
+
+        return layout;
     }
 }
