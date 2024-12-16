@@ -37,7 +37,7 @@ public class LoginUI {
                     System.out.println("Connexion réussie : " + user.getFirstName());
                     SessionManager.setCurrentUser(user);
                     mainLayout.enableMenu(); // Activer le menu après connexion
-                    mainLayout.setContent(new UserSettingsUI().getView());
+                    mainLayout.setContent(new CatalogPage().getView());
                 } else {
                     System.out.println("Identifiants incorrects !");
                 }
