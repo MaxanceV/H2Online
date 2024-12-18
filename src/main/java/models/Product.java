@@ -3,6 +3,9 @@ package models;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import dao.BrandDAO;
+import dao.CategoryDAO;
+
 public class Product {
     private int productId;
     private String name;
@@ -101,5 +104,27 @@ public class Product {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+ // Récupérer la marque du produit
+    public String getBrand() {
+        try {
+            BrandDAO brandDAO = new BrandDAO();
+            return brandDAO.getBrandByProductId(this.productId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Unknown Brand";
+        }
+    }
+
+    // Récupérer la catégorie du produit
+    public String getCategory() {
+        try {
+            CategoryDAO categoryDAO = new CategoryDAO();
+            return categoryDAO.getCategoryByProductId(this.productId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Unknown Category";
+        }
     }
 }

@@ -1,4 +1,4 @@
-package tools;
+package ui.elements;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -8,8 +8,9 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import ui.LoginUI;
-import ui.UserSettingsUI;
+import tools.SessionManager;
+import ui.pages.LoginUI;
+import ui.pages.UserSettingsUI;
 
 public class MainLayout {
     private BorderPane root; // Le layout principal

@@ -1,4 +1,4 @@
-package ui;
+package ui.pages;
 
 import dao.UserDAO;
 import javafx.geometry.Pos;
@@ -7,8 +7,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import models.User;
-import tools.MainLayout;
 import tools.PasswordManager;
+import ui.elements.MainLayout;
 
 public class RegisterUI {
     private MainLayout mainLayout;

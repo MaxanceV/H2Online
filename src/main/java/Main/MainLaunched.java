@@ -2,8 +2,8 @@ package Main;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import tools.MainLayout;
-import ui.LoginUI;
+import ui.elements.MainLayout;
+import ui.pages.LoginUI;
 
 public class MainLaunched extends Application {
 

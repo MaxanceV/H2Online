@@ -1,4 +1,4 @@
-package ui;
+package ui.pages;
 
 import dao.UserDAO;
 import javafx.geometry.Pos;
@@ -9,8 +9,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import models.User;
-import tools.MainLayout;
 import tools.SessionManager;
+import ui.elements.MainLayout;
 
 public class LoginUI {
     private MainLayout mainLayout;
