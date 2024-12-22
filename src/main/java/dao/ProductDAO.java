@@ -8,17 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDAO {
-    private Connection connection;
-
-    public ProductDAO() {
-        this.connection = DBconnection.getConnection();
-    }
 
     // Ajouter un produit
     public void addProduct(Product product) throws SQLException {
         String query = "INSERT INTO products (name, volume_per_bottle, description, image, price, stock_quantity) " +
                        "VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (Connection connection = DBconnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, product.getName());
             stmt.setBigDecimal(2, product.getVolumePerBottle());
             stmt.setString(3, product.getDescription());
@@ -28,13 +24,12 @@ public class ProductDAO {
             stmt.executeUpdate();
         }
     }
-    
-    
 
     // Récupérer un produit par son ID
     public Product getProductById(int productId) throws SQLException {
         String query = "SELECT * FROM products WHERE product_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (Connection connection = DBconnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, productId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -49,7 +44,8 @@ public class ProductDAO {
     public List<Product> getAllProducts() throws SQLException {
         List<Product> products = new ArrayList<>();
         String query = "SELECT * FROM products";
-        try (Statement stmt = connection.createStatement();
+        try (Connection connection = DBconnection.getConnection();
+             Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
                 products.add(mapProduct(rs));
@@ -61,7 +57,8 @@ public class ProductDAO {
     // Mettre à jour un produit
     public void updateProduct(Product product) throws SQLException {
         String query = "UPDATE products SET name = ?, volume_per_bottle = ?, description = ?, image = ?, price = ?, stock_quantity = ? WHERE product_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (Connection connection = DBconnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, product.getName());
             stmt.setBigDecimal(2, product.getVolumePerBottle());
             stmt.setString(3, product.getDescription());
@@ -76,7 +73,8 @@ public class ProductDAO {
     // Supprimer un produit
     public void deleteProduct(int productId) throws SQLException {
         String query = "DELETE FROM products WHERE product_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (Connection connection = DBconnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, productId);
             stmt.executeUpdate();
         }
@@ -95,5 +93,26 @@ public class ProductDAO {
         product.setCreatedAt(rs.getTimestamp("created_at"));
         product.setUpdatedAt(rs.getTimestamp("updated_at"));
         return product;
+    }
+
+    // Récupérer les produits par une liste d'IDs
+    public List<Product> getProductsByIds(List<Integer> productIds) throws SQLException {
+        List<Product> products = new ArrayList<>();
+        if (productIds.isEmpty()) return products;
+
+        String placeholders = String.join(",", productIds.stream().map(id -> "?").toArray(String[]::new));
+        String query = "SELECT * FROM products WHERE product_id IN (" + placeholders + ")";
+        try (Connection connection = DBconnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            for (int i = 0; i < productIds.size(); i++) {
+                stmt.setInt(i + 1, productIds.get(i));
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapProduct(rs));
+                }
+            }
+        }
+        return products;
     }
 }

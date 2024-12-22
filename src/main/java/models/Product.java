@@ -1,10 +1,15 @@
 package models;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import dao.BrandDAO;
 import dao.CategoryDAO;
+import tools.DBconnection;
 
 public class Product {
     private int productId;
@@ -16,6 +21,11 @@ public class Product {
     private int stockQuantity;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    
+    private BrandDAO brandDAO = new BrandDAO();
+    private CategoryDAO categoryDAO = new CategoryDAO();
+    private List<String> brands = new ArrayList<>();
+    private List<String> categories = new ArrayList<>();
 
     // Constructeurs
     public Product() {}
@@ -106,25 +116,58 @@ public class Product {
         this.updatedAt = updatedAt;
     }
     
- // Récupérer la marque du produit
-    public String getBrand() {
-        try {
-            BrandDAO brandDAO = new BrandDAO();
-            return brandDAO.getBrandByProductId(this.productId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Unknown Brand";
+//    public List<String> getBrands() {
+//        if (brands == null) { // Charger une seule fois
+//            brands = new ArrayList<>();
+//            try (Connection connection = DBconnection.getConnection()) {
+//                BrandDAO brandDAO = new BrandDAO();
+//                brands = brandDAO.getBrandsByProductId(productId); // Retourne une liste
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return brands;
+//    }
+//
+//    public List<String> getCategories() {
+//        if (categories == null) { // Charger une seule fois
+//            categories = new ArrayList<>();
+//            try (Connection connection = DBconnection.getConnection()) {
+//                CategoryDAO categoryDAO = new CategoryDAO();
+//                categories = categoryDAO.getCategoriesByProductId(productId); // Retourne une liste
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return categories;
+//    }
+//    
+
+
+    public List<String> getBrands() {
+        if (brands == null) {
+            brands = brandDAO.getBrandsByProductId(productId);
+            System.out.println("Brands for product " + productId + ": " + brands);
         }
+        return brands;
     }
 
-    // Récupérer la catégorie du produit
-    public String getCategory() {
-        try {
-            CategoryDAO categoryDAO = new CategoryDAO();
-            return categoryDAO.getCategoryByProductId(this.productId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Unknown Category";
+    public List<String> getCategories() {
+        if (categories == null) {
+            categories = categoryDAO.getCategoriesByProductId(productId);
+            System.out.println("Categories for product " + productId + ": " + categories);
         }
+        return categories;
     }
+
+
+
+    public void setBrands(List<String> brands) {
+        this.brands = brands;
+    }
+
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
+    }
+
 }

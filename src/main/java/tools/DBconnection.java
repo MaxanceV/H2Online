@@ -1,33 +1,27 @@
 package tools;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBconnection {
-    private static Connection connection;
+    private static HikariDataSource dataSource;
 
     static {
-        try {
-            String pilote = "com.mysql.cj.jdbc.Driver";
-            String nameBDD = "h2online";
-            String connetion = "jdbc:mysql://localhost:3307/" + nameBDD + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            String DBlogin = "root"; // Utilise "root" comme utilisateur
-            String DBpassword = "root"; // Utilise "root" comme mot de passe
-            Class.forName(pilote);
-            System.out.println("Tentative de connexion à la base de données...");
-            connection = DriverManager.getConnection(connetion, DBlogin, DBpassword);
-            System.out.println("Connexion réussie : " + connection);
-        } catch (ClassNotFoundException ex) {
-            System.err.println("Erreur : Pilote JDBC non trouvé.");
-            ex.printStackTrace();
-        } catch (SQLException ex) {
-            System.err.println("Erreur de connexion à la base de données.");
-            ex.printStackTrace();
-        }
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3307/h2online?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+        config.setUsername("root");
+        config.setPassword("root");
+        config.setMaximumPoolSize(10); // Nombre maximum de connexions dans le pool
+        config.setMinimumIdle(2); // Nombre minimum de connexions inactives
+        config.setIdleTimeout(30000); // Temps d'inactivité avant fermeture (30 sec)
+        config.setMaxLifetime(1800000); // Durée de vie maximale d'une connexion (30 min)
+        dataSource = new HikariDataSource(config);
     }
 
-    public static Connection getConnection() {
-        return connection;
+    public static Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 }
