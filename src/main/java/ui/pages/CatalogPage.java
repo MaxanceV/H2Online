@@ -72,11 +72,7 @@ public class CatalogPage {
 
 
                 // Créer une carte pour le produit
-                ProductCard card = new ProductCard(
-                    product,
-                    () -> showProductDetails(product), // Callback pour cliquer sur l'image
-                    () -> addToCart(product)          // Callback pour ajouter au panier
-                );
+                ProductCard card = new ProductCard(product);
                 productPane.getChildren().add(card);
             }
         } catch (SQLException e) {
@@ -119,11 +115,7 @@ public class CatalogPage {
 //                System.out.println("Product categories: " + product.getCategories());
 
                 if (isProductMatchingFilters(product, searchQuery, selectedBrands, selectedCategories, minPrice, maxPrice)) {
-                    ProductCard card = new ProductCard(
-                        product,
-                        () -> showProductDetails(product),
-                        () -> addToCart(product)
-                    );
+                    ProductCard card = new ProductCard(product);
                     productPane.getChildren().add(card);
                 } else {
                     System.out.println("Product did not match filters: " + product.getName());
@@ -154,15 +146,5 @@ public class CatalogPage {
 //        System.out.println("Matches price: " + matchesPrice);
 
         return matchesSearch && matchesBrand && matchesCategory && matchesPrice;
-    }
-
-    private void showProductDetails(Product product) {
-        System.out.println("Show details for: " + product.getName());
-        // Ajouter le code pour afficher une page détaillée du produit
-    }
-
-    private void addToCart(Product product) {
-        System.out.println("Added to cart: " + product.getName());
-        // Ajouter le code pour gérer l'ajout au panier
     }
 }

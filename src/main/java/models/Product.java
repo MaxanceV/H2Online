@@ -169,5 +169,17 @@ public class Product {
     public void setCategories(List<String> categories) {
         this.categories = categories;
     }
+    
+    public void reloadDetails() {
+        if (brands == null || brands.isEmpty()) {
+            BrandDAO brandDAO = new BrandDAO();
+            this.brands = brandDAO.getBrandsByProductId(productId);
+        }
+        if (categories == null || categories.isEmpty()) {
+            CategoryDAO categoryDAO = new CategoryDAO();
+            this.categories = categoryDAO.getCategoriesByProductId(productId);
+        }
+    }
+
 
 }

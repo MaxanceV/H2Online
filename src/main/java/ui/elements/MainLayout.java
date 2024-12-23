@@ -6,8 +6,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import tools.SessionManager;
 import ui.pages.LoginUI;
 import ui.pages.UserSettingsUI;
@@ -17,28 +20,34 @@ public class MainLayout {
     private Scene scene;     // La scène de l'application
     private MenuButton menuButton; // Menu déroulant
 
-    public MainLayout() {
+    public MainLayout(Stage primaryStage) {
         // Initialiser le layout
         root = new BorderPane();
-        createHeader();
+        createHeader(primaryStage);
         createFooter();
         scene = new Scene(root, 800, 600); // Taille par défaut
     }
 
     // Création du header
-    private void createHeader() {
-        HBox header = new HBox(20);
+    private void createHeader(Stage primaryStage) {
+        HBox header = new HBox(5); // Espacement très réduit entre les éléments
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setStyle("-fx-background-color: #333333; -fx-padding: 10;");
+        header.setStyle("-fx-background-color: #333333; -fx-padding: 5;"); // Réduction du padding global
 
         // Logo
-//        ImageView logo = new ImageView(new Image(getClass().getResourceAsStream("/icons/logo.png")));
-//        logo.setFitWidth(50);
-//        logo.setFitHeight(50);
+        Image logoImage = new Image(getClass().getResourceAsStream("/images/logo/logo_goutte.png"));
+        ImageView logo = new ImageView(logoImage);
+        logo.setFitWidth(50); // Taille adaptée
+        logo.setFitHeight(50); // Taille adaptée pour un alignement parfait avec le titre
+        logo.setPreserveRatio(true); // Conserver les proportions
+        logo.setSmooth(true); // Améliorer le rendu visuel
+
+        // Définir le logo comme icône de la fenêtre
+        primaryStage.getIcons().add(logoImage);
 
         // Titre du site
         Label siteName = new Label("H2Online");
-        siteName.setStyle("-fx-text-fill: white; -fx-font-size: 24px;");
+        siteName.setStyle("-fx-text-fill: white; -fx-font-size: 20px; -fx-padding: 0;"); // Alignement avec le logo
 
         // Menu déroulant
         menuButton = new MenuButton("Navigation");
@@ -49,10 +58,9 @@ public class MainLayout {
 
         menuButton.getItems().addAll(homeItem, cartItem, settingsItem, logoutItem);
 
-        // Ajouter les éléments au header
-//        header.getChildren().addAll(logo, siteName, menuButton);
-        header.getChildren().addAll(siteName, menuButton);
-        
+        // Ajouter les éléments au header (logo, titre, menu sur une seule ligne)
+        header.getChildren().addAll(logo, siteName, menuButton);
+
         root.setTop(header);
 
         // Actions des éléments du menu
@@ -73,7 +81,7 @@ public class MainLayout {
         footer.setAlignment(Pos.CENTER);
         footer.setStyle("-fx-background-color: #333333; -fx-padding: 10;");
 
-        Label footerLabel = new Label("© 2024 H2Online - Tous droits réservés");
+        Label footerLabel = new Label("© 2024 H2Online - All rights reserved");
         footerLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
 
         footer.getChildren().add(footerLabel);

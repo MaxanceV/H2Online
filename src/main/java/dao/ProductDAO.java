@@ -115,4 +115,46 @@ public class ProductDAO {
         }
         return products;
     }
+    
+    public List<Product> getRecommendations(Product product) {
+        List<Product> recommendations = new ArrayList<>();
+        String query = "SELECT DISTINCT p.* " +
+                       "FROM products p " +
+                       "LEFT JOIN productsbrands pb ON p.product_id = pb.product_id " +
+                       "LEFT JOIN brands b ON pb.brand_id = b.brand_id " +
+                       "LEFT JOIN productscategories pc ON p.product_id = pc.product_id " +
+                       "LEFT JOIN categories c ON pc.category_id = c.category_id " +
+                       "WHERE p.product_id != ? " +
+                       "AND (b.name IN ( " +
+                       "    SELECT b2.name " +
+                       "    FROM productsbrands pb2 " +
+                       "    JOIN brands b2 ON pb2.brand_id = b2.brand_id " +
+                       "    WHERE pb2.product_id = ? " +
+                       ") OR c.name IN ( " +
+                       "    SELECT c2.name " +
+                       "    FROM productscategories pc2 " +
+                       "    JOIN categories c2 ON pc2.category_id = c2.category_id " +
+                       "    WHERE pc2.product_id = ? " +
+                       ")) " +
+                       "LIMIT 15";
+
+        try (Connection connection = DBconnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, product.getProductId()); // Exclure le produit actuel
+            stmt.setInt(2, product.getProductId()); // Filtrer par marques similaires
+            stmt.setInt(3, product.getProductId()); // Filtrer par catégories similaires
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    recommendations.add(mapProduct(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return recommendations;
+    }
+
+
 }
