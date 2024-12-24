@@ -1,6 +1,12 @@
 package models;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import tools.DBconnection;
 
 public class OrderItem {
     private int orderItemId;
@@ -89,5 +95,21 @@ public class OrderItem {
             System.out.println("Warning: Cannot update subtotal price because unitPrice is null or quantity is invalid.");
         }
     }
+    
+    public String getProductName() throws SQLException {
+        // On suppose que chaque OrderItem a un productId
+        String query = "SELECT name FROM products WHERE product_id = ?";
+        try (Connection connection = DBconnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, this.getProductId());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("name");
+                }
+            }
+        }
+        throw new SQLException("Product name not found for product ID: " + this.getProductId());
+    }
+
 
 }

@@ -76,4 +76,49 @@ public class OrderDAO {
             statement.executeUpdate();
         }
     }
+    
+    public Order getOrderById(int orderId) throws SQLException {
+        String query = "SELECT * FROM orders WHERE order_id = ?";
+        try (Connection connection = DBconnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, orderId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Order order = new Order();
+                    order.setOrderId(rs.getInt("order_id"));
+                    order.setUserId(rs.getInt("user_id"));
+                    order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
+                    order.setStatus(rs.getString("status"));
+                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setPaymentMethod(rs.getString("payment_method"));
+                    return order;
+                }
+            }
+        }
+        return null; // Si aucune commande trouvée
+    }
+    
+    public List<Order> getOrdersByUser(int userId) throws SQLException {
+        String query = "SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC";
+        List<Order> orders = new ArrayList<>();
+        try (Connection connection = DBconnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Order order = new Order();
+                    order.setOrderId(rs.getInt("order_id"));
+                    order.setUserId(rs.getInt("user_id"));
+                    order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
+                    order.setStatus(rs.getString("status"));
+                    order.setTotalPrice(rs.getBigDecimal("total_price"));
+                    order.setPaymentMethod(rs.getString("payment_method"));
+                    orders.add(order);
+                }
+            }
+        }
+        return orders;
+    }
+
+
 }

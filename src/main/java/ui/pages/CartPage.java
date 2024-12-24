@@ -31,9 +31,7 @@ public class CartPage {
 
     public CartPage() {
         layout = new BorderPane();
-
-        // Add cart content to the left and total summary to the right
-        populateCartContent();
+        populateCartContent(); // Ajouter le contenu initial
     }
 
     public BorderPane getView() {
@@ -46,7 +44,7 @@ public class CartPage {
         OrderItemDAO orderItemDAO = new OrderItemDAO();
 
         try {
-            // Get the "in progress" order for the user
+            // Obtenir la commande "in progress"
             Order inProgressOrder = orderDAO.getInProgressOrder(userId);
             if (inProgressOrder == null) {
                 layout.setCenter(new Label("Your cart is empty."));
@@ -55,9 +53,9 @@ public class CartPage {
 
             List<OrderItem> orderItems = orderItemDAO.getOrderItems(inProgressOrder.getOrderId());
 
-            // Left side: List of cart items
+            // Partie gauche : Liste des articles du panier
             VBox cartItemsBox = new VBox(10);
-            cartItemsBox.setPadding(new Insets(20));
+            cartItemsBox.setPadding(new Insets(10));
             cartItemsBox.setAlignment(Pos.TOP_LEFT);
 
             Label cartTitle = new Label("Current Cart Contents");
@@ -71,11 +69,10 @@ public class CartPage {
 
             ScrollPane scrollPane = new ScrollPane(cartItemsBox);
             scrollPane.setFitToWidth(true);
-            scrollPane.setFitToHeight(true); // Enable vertical scrolling if necessary
-
+            scrollPane.setFitToHeight(true); // Activer le défilement si nécessaire
             layout.setLeft(scrollPane);
 
-            // Right side: Total summary and validate button
+            // Partie droite : Résumé total et bouton de validation
             VBox totalBox = createTotalSummaryBox(inProgressOrder, orderItemDAO);
             layout.setRight(totalBox);
 
@@ -90,7 +87,7 @@ public class CartPage {
         itemRow.setPadding(new Insets(10));
         itemRow.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
-        // Fetch product details from the database
+        // Récupérer les détails du produit
         ProductDAO productDAO = new ProductDAO();
         Product product = productDAO.getProductById(item.getProductId());
 
@@ -98,7 +95,12 @@ public class CartPage {
             throw new SQLException("Product not found for item with ID: " + item.getOrderItemId());
         }
 
-        // Product Name, Description, and Image
+        // Image du produit
+        ImageView productImage = new ImageView(new Image(getClass().getResourceAsStream("/images/products/" + product.getImage())));
+        productImage.setFitWidth(100);
+        productImage.setPreserveRatio(true);
+
+        // Informations sur le produit
         VBox productInfoBox = new VBox(5);
         productInfoBox.setAlignment(Pos.TOP_LEFT);
 
@@ -109,13 +111,12 @@ public class CartPage {
         description.setWrapText(true);
         description.setMaxWidth(200);
 
-        ImageView productImage = new ImageView(new Image(getClass().getResourceAsStream("/images/products/" + product.getImage())));
-        productImage.setFitWidth(100);
-        productImage.setPreserveRatio(true);
+        Label volume = new Label(product.getVolumePerBottle() + "L");
+        volume.setStyle("-fx-text-fill: gray; -fx-font-size: 12px;");
 
-        productInfoBox.getChildren().addAll(productName, productImage, description);
+        productInfoBox.getChildren().addAll(productName, description, volume);
 
-        // Quantity selector
+        // Sélecteur de quantité
         VBox quantityBox = new VBox(3);
         quantityBox.setAlignment(Pos.CENTER);
 
@@ -123,7 +124,7 @@ public class CartPage {
         Spinner<Integer> quantitySpinner = new Spinner<>();
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, product.getStockQuantity(), item.getQuantity());
         quantitySpinner.setValueFactory(valueFactory);
-        quantitySpinner.setMaxWidth(70); // Reduce the width of the spinner
+        quantitySpinner.setMaxWidth(70); // Réduire la largeur du spinner
 
         Button updateQuantityButton = new Button();
         ImageView editIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/logo/edit.png")));
@@ -143,7 +144,7 @@ public class CartPage {
 
         quantityBox.getChildren().addAll(quantityLabel, quantitySpinner, updateQuantityButton);
 
-        // Subtotal
+        // Sous-total
         VBox subtotalBox = new VBox(3);
         subtotalBox.setAlignment(Pos.CENTER);
 
@@ -151,7 +152,7 @@ public class CartPage {
         Label subtotalPrice = new Label(item.getSubtotalPrice() + " €");
         subtotalBox.getChildren().addAll(subtotalText, subtotalPrice);
 
-        // Delete button
+        // Bouton de suppression
         Button deleteButton = new Button();
         ImageView binIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/logo/bin.png")));
         binIcon.setFitWidth(20);
@@ -162,8 +163,6 @@ public class CartPage {
             try {
                 orderItemDAO.deleteOrderItem(item.getOrderItemId());
                 NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(), "Item removed from cart!", true);
-
-                // Update cart view
                 populateCartContent();
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -171,17 +170,16 @@ public class CartPage {
             }
         });
 
-        itemRow.getChildren().addAll(productInfoBox, quantityBox, subtotalBox, deleteButton);
+        itemRow.getChildren().addAll(productImage, productInfoBox, quantityBox, subtotalBox, deleteButton);
         return itemRow;
     }
 
     private VBox createTotalSummaryBox(Order inProgressOrder, OrderItemDAO orderItemDAO) throws SQLException {
-        VBox totalBox = new VBox(20);
+        VBox totalBox = new VBox(10);
         totalBox.setAlignment(Pos.TOP_RIGHT);
         totalBox.setPadding(new Insets(20));
-        totalBox.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
-        // Total amount
+        // Montant total
         BigDecimal totalAmount = orderItemDAO.getOrderItems(inProgressOrder.getOrderId())
                 .stream()
                 .map(OrderItem::getSubtotalPrice)
@@ -190,18 +188,16 @@ public class CartPage {
         Label totalLabel = new Label("Total: " + totalAmount + " €");
         totalLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // Validate and Pay button
+        // Bouton de validation et paiement
         Button validateButton = new Button("Validate and Pay");
         validateButton.setStyle("-fx-font-size: 16px; -fx-background-color: green; -fx-text-fill: white;");
         validateButton.setOnAction(e -> {
             try {
-                inProgressOrder.setStatus("validated");
-                new OrderDAO().updateOrderStatus(inProgressOrder.getOrderId(), "validated");
-                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(), "Order validated successfully!", true);
-                populateCartContent(); // Refresh the page
-            } catch (SQLException ex) {
+                // Rediriger vers la nouvelle page OrderValidationPage
+                SessionManager.getMainLayout().setContent(new OrderValidationPage(inProgressOrder).getView());
+            } catch (Exception ex) {
                 ex.printStackTrace();
-                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(), "Failed to validate order!", false);
+                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(), "An error occurred while redirecting to validation page!", false);
             }
         });
 

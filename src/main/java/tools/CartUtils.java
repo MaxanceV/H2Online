@@ -2,12 +2,14 @@ package tools;
 
 import dao.OrderDAO;
 import dao.OrderItemDAO;
+import dao.ProductDAO;
 import models.Order;
 import models.OrderItem;
 import models.Product;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.List;
 
 public class CartUtils {
 
@@ -72,6 +74,31 @@ public class CartUtils {
 	    } catch (IllegalArgumentException e) {
 	        System.out.println("Error: " + e.getMessage());
 	    }
+	}
+	
+	public static boolean checkProductAvailability(Order order) throws SQLException {
+	    OrderItemDAO orderItemDAO = new OrderItemDAO();
+	    ProductDAO productDAO = new ProductDAO();
+
+	    List<OrderItem> orderItems = orderItemDAO.getOrderItems(order.getOrderId());
+	    boolean isCartValid = true;
+
+	    for (OrderItem item : orderItems) {
+	        Product product = productDAO.getProductById(item.getProductId());
+
+	        if (product.getStockQuantity() < item.getQuantity()) {
+	            if (product.getStockQuantity() > 0) {
+	                item.setQuantity(product.getStockQuantity());
+	                item.setSubtotalPrice(product.getPrice().multiply(new BigDecimal(product.getStockQuantity())));
+	                orderItemDAO.updateOrderItem(item);
+	            } else {
+	                orderItemDAO.deleteOrderItem(item.getOrderItemId());
+	            }
+	            isCartValid = false;
+	        }
+	    }
+
+	    return isCartValid;
 	}
 
 }

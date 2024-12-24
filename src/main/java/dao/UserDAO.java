@@ -71,9 +71,11 @@ public class UserDAO {
 
     // Mettre à jour un utilisateur
     public void updateUser(User user) throws SQLException {
-        String query = "UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, address = ?, city = ?, postal_code = ?, country = ?, password = ?, role = ? WHERE user_id = ?";
+        String query = "UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, address = ?, city = ?, postal_code = ?, country = ?, role = ? WHERE user_id = ?";
+        
         try (Connection connection = DBconnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
+             
             stmt.setString(1, user.getFirstName());
             stmt.setString(2, user.getLastName());
             stmt.setString(3, user.getEmail());
@@ -82,12 +84,23 @@ public class UserDAO {
             stmt.setString(6, user.getCity());
             stmt.setString(7, user.getPostalCode());
             stmt.setString(8, user.getCountry());
-            stmt.setString(9, PasswordManager.hashPassword(user.getPassword()));
-            stmt.setString(10, user.getRole());
-            stmt.setInt(11, user.getId());
+            stmt.setString(9, user.getRole());
+            stmt.setInt(10, user.getId());
+
             stmt.executeUpdate();
         }
+
+        // Si un mot de passe a été fourni, mettez-le à jour séparément
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            String passwordQuery = "UPDATE users SET password = ? WHERE user_id = ?";
+            try (PreparedStatement stmt = DBconnection.getConnection().prepareStatement(passwordQuery)) {
+                stmt.setString(1, PasswordManager.hashPassword(user.getPassword()));
+                stmt.setInt(2, user.getId());
+                stmt.executeUpdate();
+            }
+        }
     }
+
 
     // Vérifier si un email existe
     public boolean emailExists(String email) throws SQLException {

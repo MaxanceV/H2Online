@@ -24,7 +24,9 @@ public class CatalogFilter {
     private ScrollPane categoryFilterScrollPane; // Zone de défilement pour les catégories
     private VBox categoryFilter; // Contiendra les CheckBoxes pour les catégories
     private RangeSlider priceRangeSlider; // Slider pour plage de prix
+    private RangeSlider volumeRangeSlider;
     private Button applyFiltersButton;
+    
 
     public CatalogFilter() {
         view = new GridPane();
@@ -60,6 +62,17 @@ public class CatalogFilter {
 
         VBox priceBox = new VBox(5, priceLabel, priceRangeSlider);
         priceBox.setAlignment(Pos.CENTER_LEFT);
+        
+        // Ajout du filtre de volume dans le constructeur
+        Label volumeLabel = new Label("Volume range (L)");
+        volumeRangeSlider = new RangeSlider(0.0, 2.0, 0.0, 2.0); // Plage par défaut de 0L à 2L
+        volumeRangeSlider.setShowTickLabels(true);
+        volumeRangeSlider.setShowTickMarks(true);
+        volumeRangeSlider.setMajorTickUnit(0.5); // Graduation toutes les 0.5L
+        volumeRangeSlider.setBlockIncrement(0.1); // Incrément de 0.1L
+
+        VBox volumeBox = new VBox(5, volumeLabel, volumeRangeSlider);
+        volumeBox.setAlignment(Pos.CENTER_LEFT);
 
         // Bouton pour appliquer les filtres
         applyFiltersButton = new Button("Apply Filters");
@@ -71,7 +84,8 @@ public class CatalogFilter {
         view.add(categoryLabel, 0, 3);
         view.add(categoryFilterScrollPane, 0, 4);
         view.add(priceBox, 0, 5, 1, 1);
-        view.add(applyFiltersButton, 0, 6, 1, 1);
+        view.add(volumeBox, 0, 6, 1, 1); 
+        view.add(applyFiltersButton, 0, 7, 1, 1);
     }
 
     public GridPane getView() {
@@ -146,5 +160,13 @@ public class CatalogFilter {
 
     public Button getSearchButton() {
         return searchButton;
+    }
+    
+    public double getMinVolume() {
+        return volumeRangeSlider.getLowValue();
+    }
+
+    public double getMaxVolume() {
+        return volumeRangeSlider.getHighValue();
     }
 }

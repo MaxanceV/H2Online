@@ -91,6 +91,9 @@ public class CatalogPage {
         List<String> selectedCategories = catalogFilter.getSelectedCategories();
         double minPrice = catalogFilter.getMinPrice();
         double maxPrice = catalogFilter.getMaxPrice();
+        double minVolume = catalogFilter.getMinVolume();
+        double maxVolume = catalogFilter.getMaxVolume();
+
 
         productPane.getChildren().clear();
         ProductDAO productDAO = new ProductDAO();
@@ -109,7 +112,7 @@ public class CatalogPage {
                 product.setBrands(brandsByProduct.getOrDefault(product.getProductId(), new ArrayList<>()));
                 product.setCategories(categoriesByProduct.getOrDefault(product.getProductId(), new ArrayList<>()));
 
-                if (isProductMatchingFilters(product, searchQuery, selectedBrands, selectedCategories, minPrice, maxPrice)) {
+                if (isProductMatchingFilters(product, searchQuery, selectedBrands, selectedCategories, minPrice, maxPrice, minVolume, maxVolume)) {
                     ProductCard card = new ProductCard(product);
                     productPane.getChildren().add(card);
                 }
@@ -119,7 +122,7 @@ public class CatalogPage {
         }
     }
 
-    private boolean isProductMatchingFilters(Product product, String searchQuery, List<String> selectedBrands, List<String> selectedCategories, double minPrice, double maxPrice) {
+    private boolean isProductMatchingFilters(Product product, String searchQuery, List<String> selectedBrands, List<String> selectedCategories, double minPrice, double maxPrice, double minVolume, double maxVolume) {
         boolean matchesSearch = searchQuery == null || searchQuery.isEmpty() ||
                 product.getName().toLowerCase().contains(searchQuery.toLowerCase()) ||
                 product.getDescription().toLowerCase().contains(searchQuery.toLowerCase());
@@ -132,6 +135,9 @@ public class CatalogPage {
 
         boolean matchesPrice = product.getPrice().doubleValue() >= minPrice && product.getPrice().doubleValue() <= maxPrice;
 
-        return matchesSearch && matchesBrand && matchesCategory && matchesPrice;
+        boolean matchesVolume = product.getVolumePerBottle().doubleValue() >= minVolume && product.getVolumePerBottle().doubleValue() <= maxVolume;
+
+        return matchesSearch && matchesBrand && matchesCategory && matchesPrice && matchesVolume;
     }
+
 }

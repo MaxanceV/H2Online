@@ -1,20 +1,20 @@
 package ui.elements;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import models.Product;
 import tools.CartUtils;
 import tools.SessionManager;
 import ui.pages.ProductDetail;
-
-import java.io.File;
-import java.nio.file.Paths;
 
 public class ProductCard extends VBox {
 
@@ -48,10 +48,28 @@ public class ProductCard extends VBox {
             }
         });
 
+        // Nom du produit avec troncature
+        String productName = product.getName().length() > 17 
+                ? product.getName().substring(0, 17) + "..." 
+                : product.getName();
+        Text name = new Text(productName);
+        name.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-fill: black;");
+        name.setTextAlignment(TextAlignment.LEFT);
 
-        // Nom et prix du produit
-        Text name = new Text(product.getName());
+        // Volume par unité
+        Text volume = new Text(product.getVolumePerBottle() + "L");
+        volume.setStyle("-fx-font-size: 12px; -fx-fill: gray;");
+        volume.setTextAlignment(TextAlignment.LEFT);
+
+        // Conteneur pour le nom et le volume
+        VBox nameVolumeBox = new VBox(2);
+        nameVolumeBox.setAlignment(Pos.TOP_LEFT); // Alignement à gauche
+        nameVolumeBox.getChildren().addAll(name, volume);
+
+        // Prix du produit
         Text price = new Text(product.getPrice() + " €");
+        price.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-fill: black;");
+        price.setTextAlignment(TextAlignment.CENTER);
 
         // Vérifier le stock du produit
         if (product.getStockQuantity() > 0) {
@@ -72,14 +90,13 @@ public class ProductCard extends VBox {
                 CartUtils.addToCart(SessionManager.getCurrentUser().getId(), product, 1);
             });
 
-
-            // Ajouter le bouton au VBox
-            this.getChildren().addAll(productImageView, name, price, addToCartButton);
+            // Ajouter les éléments au VBox
+            this.getChildren().addAll(productImageView, nameVolumeBox, price, addToCartButton);
         } else {
             // Afficher "Out of stock" si le stock est insuffisant
             Text outOfStock = new Text("Out of stock");
             outOfStock.setStyle("-fx-fill: red; -fx-font-weight: bold;");
-            this.getChildren().addAll(productImageView, name, price, outOfStock);
+            this.getChildren().addAll(productImageView, nameVolumeBox, price, outOfStock);
         }
     }
 

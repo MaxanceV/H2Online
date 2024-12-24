@@ -23,6 +23,7 @@ import tools.SessionManager;
 import ui.pages.CartPage;
 import ui.pages.CatalogPage;
 import ui.pages.LoginUI;
+import ui.pages.OrderHistoryPage;
 import ui.pages.RegisterUI;
 import ui.pages.UserSettingsUI;
 
@@ -106,6 +107,9 @@ public class MainLayout {
         profileIcon.setFitWidth(30);
         profileIcon.setFitHeight(30);
         profileMenuButton.setGraphic(profileIcon);
+        
+        MenuItem orderHistory = new MenuItem("Order History");
+        orderHistory.setOnAction(e -> setContent(new OrderHistoryPage().getView()));
 
         MenuItem userSettingsItem = new MenuItem("User Settings");
         userSettingsItem.setOnAction(e -> setContent(new UserSettingsUI().getView()));
@@ -118,7 +122,7 @@ public class MainLayout {
             setContent(new LoginUI(this).getView());
         });
 
-        profileMenuButton.getItems().addAll(userSettingsItem, logoutItem);
+        profileMenuButton.getItems().addAll(orderHistory, userSettingsItem, logoutItem);
 
         rightSection.getChildren().addAll(cartButton, profileMenuButton);
 
