@@ -3,6 +3,7 @@ package ui.pages;
 import dao.BrandDAO;
 import dao.CategoryDAO;
 import dao.ProductDAO;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import models.Product;
@@ -20,6 +21,7 @@ public class CatalogPage {
     private BorderPane view;
     private FlowPane productPane;
     private CatalogFilter catalogFilter;
+    private ScrollPane scrollPane; // Ajout du ScrollPane
 
     public CatalogPage() {
         view = new BorderPane();
@@ -28,6 +30,13 @@ public class CatalogPage {
         productPane = new FlowPane();
         productPane.setHgap(10);
         productPane.setVgap(10);
+
+        // Encapsuler le FlowPane dans un ScrollPane
+        scrollPane = new ScrollPane(productPane);
+        scrollPane.setFitToWidth(true); // Ajuste la largeur pour correspondre au contenu
+        scrollPane.setFitToHeight(true); // Ajuste la hauteur pour correspondre au contenu
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Activer la barre verticale si nécessaire
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Désactiver la barre horizontale
 
         // Créer et configurer le filtre du catalogue
         catalogFilter = new CatalogFilter();
@@ -38,7 +47,7 @@ public class CatalogPage {
         loadProducts();
 
         // Ajouter les sections au layout principal
-        view.setCenter(productPane);
+        view.setCenter(scrollPane); // Utiliser le ScrollPane comme contenu central
         view.setLeft(catalogFilter.getView()); // Place le filtre à gauche
     }
 
@@ -64,12 +73,8 @@ public class CatalogPage {
 
             // Ajouter les marques et catégories aux objets produits
             for (Product product : products) {
-            	product.setBrands(brandsByProduct.getOrDefault(product.getProductId(), Collections.emptyList()));
-            	product.setCategories(categoriesByProduct.getOrDefault(product.getProductId(), Collections.emptyList()));
-
-//            	System.out.println("Loaded brands for product " + product.getProductId() + ": " + product.getBrands());
-//            	System.out.println("Loaded categories for product " + product.getProductId() + ": " + product.getCategories());
-
+                product.setBrands(brandsByProduct.getOrDefault(product.getProductId(), Collections.emptyList()));
+                product.setCategories(categoriesByProduct.getOrDefault(product.getProductId(), Collections.emptyList()));
 
                 // Créer une carte pour le produit
                 ProductCard card = new ProductCard(product);
@@ -86,12 +91,6 @@ public class CatalogPage {
         List<String> selectedCategories = catalogFilter.getSelectedCategories();
         double minPrice = catalogFilter.getMinPrice();
         double maxPrice = catalogFilter.getMaxPrice();
-
-//        System.out.println("Filters applied:");
-//        System.out.println("Search: " + searchQuery);
-//        System.out.println("Selected Brands: " + selectedBrands);
-//        System.out.println("Selected Categories: " + selectedCategories);
-//        System.out.println("Price range: " + minPrice + " - " + maxPrice);
 
         productPane.getChildren().clear();
         ProductDAO productDAO = new ProductDAO();
@@ -110,15 +109,9 @@ public class CatalogPage {
                 product.setBrands(brandsByProduct.getOrDefault(product.getProductId(), new ArrayList<>()));
                 product.setCategories(categoriesByProduct.getOrDefault(product.getProductId(), new ArrayList<>()));
 
-//                System.out.println("Evaluating product: " + product.getName());
-//                System.out.println("Product brands: " + product.getBrands());
-//                System.out.println("Product categories: " + product.getCategories());
-
                 if (isProductMatchingFilters(product, searchQuery, selectedBrands, selectedCategories, minPrice, maxPrice)) {
                     ProductCard card = new ProductCard(product);
                     productPane.getChildren().add(card);
-                } else {
-                    System.out.println("Product did not match filters: " + product.getName());
                 }
             }
         } catch (SQLException e) {
@@ -131,19 +124,13 @@ public class CatalogPage {
                 product.getName().toLowerCase().contains(searchQuery.toLowerCase()) ||
                 product.getDescription().toLowerCase().contains(searchQuery.toLowerCase());
 
-        boolean matchesBrand = selectedBrands.isEmpty() || 
+        boolean matchesBrand = selectedBrands.isEmpty() ||
                 product.getBrands().stream().anyMatch(selectedBrands::contains);
 
-        boolean matchesCategory = selectedCategories.isEmpty() || 
+        boolean matchesCategory = selectedCategories.isEmpty() ||
                 product.getCategories().stream().anyMatch(selectedCategories::contains);
 
         boolean matchesPrice = product.getPrice().doubleValue() >= minPrice && product.getPrice().doubleValue() <= maxPrice;
-
-//        System.out.println("Product: " + product.getName());
-//        System.out.println("Matches search: " + matchesSearch);
-//        System.out.println("Matches brand: " + matchesBrand);
-//        System.out.println("Matches category: " + matchesCategory);
-//        System.out.println("Matches price: " + matchesPrice);
 
         return matchesSearch && matchesBrand && matchesCategory && matchesPrice;
     }

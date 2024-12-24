@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import models.Product;
+import tools.CartUtils;
 import tools.SessionManager;
 import ui.pages.ProductDetail;
 
@@ -68,9 +69,9 @@ public class ProductCard extends VBox {
 
             // Action du bouton
             addToCartButton.setOnAction(e -> {
-                // Ajouter au panier (à implémenter selon votre logique)
-                System.out.println("Ajouté au panier : " + product.getName());
+                CartUtils.addToCart(SessionManager.getCurrentUser().getId(), product, 1);
             });
+
 
             // Ajouter le bouton au VBox
             this.getChildren().addAll(productImageView, name, price, addToCartButton);

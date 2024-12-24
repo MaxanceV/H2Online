@@ -15,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Product;
+import tools.CartUtils;
 import tools.SessionManager;
 import ui.elements.ProductCard;
 
@@ -70,7 +71,9 @@ public class ProductDetail {
 
             // Bouton "Add to cart"
             javafx.scene.control.Button addToCartButton = new javafx.scene.control.Button("Add to cart");
-            addToCartButton.setOnAction(e -> addToCart(product, quantitySpinner.getValue())); // Appelle la fonction globale
+            addToCartButton.setOnAction(e -> {
+                CartUtils.addToCart(SessionManager.getCurrentUser().getId(), product, quantitySpinner.getValue());
+            });
 
             rightSection.getChildren().addAll(quantityLabel, quantitySpinner, addToCartButton);
         } else {
@@ -83,9 +86,7 @@ public class ProductDetail {
         // Bouton pour voir le panier
         Button viewCartButton = new Button("View Cart");
         viewCartButton.setOnAction(e -> {
-            // Logique pour afficher la page du panier
-            System.out.println("Navigating to cart...");
-//            SessionManager.getMainLayout().setContent(new CartPage().getView());
+            SessionManager.getMainLayout().setContent(new CartPage().getView());
         });
 
         // Ajouter le bouton dans tous les cas (qu'il y ait du stock ou non)
@@ -140,11 +141,6 @@ public class ProductDetail {
         return List.of(); // Retourne une liste vide en cas d'erreur
     }
 
-    // Fonction globale pour ajouter un produit au panier
-    private void addToCart(Product product, int quantity) {
-        System.out.println("Added to cart: " + product.getName() + " | Quantity: " + quantity);
-        // Logique pour ajouter au panier
-    }
 
     // Méthode pour obtenir la vue principale
     public BorderPane getView() {
