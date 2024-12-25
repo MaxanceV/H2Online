@@ -10,10 +10,10 @@ import models.User;
 import tools.PasswordManager;
 import ui.elements.MainLayout;
 
-public class RegisterUI {
+public class RegisterPage {
     private MainLayout mainLayout;
 
-    public RegisterUI(MainLayout mainLayout) {
+    public RegisterPage(MainLayout mainLayout) {
         this.mainLayout = mainLayout;
     }
 
@@ -85,7 +85,7 @@ public class RegisterUI {
 
                     userDAO.addUser(newUser);
                     System.out.println("Utilisateur inscrit avec succès !");
-                    mainLayout.setContent(new LoginUI(mainLayout).getView()); // Redirection vers la connexion
+                    mainLayout.setContent(new LoginPage(mainLayout).getView()); // Redirection vers la connexion
                 } else {
                     errorLabel.setText("Cet email est déjà utilisé !");
                 }
@@ -96,7 +96,7 @@ public class RegisterUI {
         });
 
         cancelButton.setOnAction(e -> {
-            mainLayout.setContent(new LoginUI(mainLayout).getView()); // Retour à la page de connexion
+            mainLayout.setContent(new LoginPage(mainLayout).getView()); // Retour à la page de connexion
         });
 
         // Disposition des éléments

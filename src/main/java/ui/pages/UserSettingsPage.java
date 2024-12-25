@@ -12,10 +12,10 @@ import javafx.scene.layout.VBox;
 import models.User;
 import tools.SessionManager;
 
-public class UserSettingsUI {
+public class UserSettingsPage {
     private User user;
 
-    public UserSettingsUI() {
+    public UserSettingsPage() {
         this.user = SessionManager.getCurrentUser(); // L'utilisateur actuellement connecté
     }
 

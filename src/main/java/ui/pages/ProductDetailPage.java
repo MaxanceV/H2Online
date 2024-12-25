@@ -21,11 +21,11 @@ import ui.elements.ProductCard;
 
 import java.util.List;
 
-public class ProductDetail {
+public class ProductDetailPage {
     private BorderPane layout;
     private Scene scene;
 
-    public ProductDetail(Product product) {
+    public ProductDetailPage(Product product) {
         layout = new BorderPane();
 
         // Conteneur principal pour tout le contenu de la page (à placer dans un ScrollPane)

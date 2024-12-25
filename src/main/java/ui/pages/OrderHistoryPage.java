@@ -40,14 +40,23 @@ public class OrderHistoryPage {
                 Label orderLabel = new Label("Order ID: " + order.getOrderId() +
                         " | Date: " + order.getOrderDate() +
                         " | Total: " + order.getTotalPrice() + " €" +
-                        " | Status: " + order.getStatus());
+                        " | Status: ");
+                Label statusLabel = new Label(order.getStatus());
+                
+                // Appliquer le style vert gras si le statut est "delivered"
+                if ("delivered".equalsIgnoreCase(order.getStatus())) {
+                    statusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+                } else {
+                    statusLabel.setStyle("-fx-text-fill: black;"); // Style par défaut pour les autres statuts
+                }
+
                 Button viewInvoiceButton = new Button("View Invoice");
                 viewInvoiceButton.setOnAction(e -> {
                     // Afficher ou télécharger la facture
                     new InvoiceDAO().downloadInvoice(order.getOrderId());
                 });
 
-                orderBox.getChildren().addAll(orderLabel, viewInvoiceButton);
+                orderBox.getChildren().addAll(orderLabel, statusLabel, viewInvoiceButton);
                 contentBox.getChildren().add(orderBox);
             }
         } catch (SQLException e) {

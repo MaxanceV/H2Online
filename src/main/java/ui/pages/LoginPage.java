@@ -12,10 +12,10 @@ import models.User;
 import tools.SessionManager;
 import ui.elements.MainLayout;
 
-public class LoginUI {
+public class LoginPage {
     private MainLayout mainLayout;
 
-    public LoginUI(MainLayout mainLayout) {
+    public LoginPage(MainLayout mainLayout) {
         this.mainLayout = mainLayout;
     }
 
@@ -48,7 +48,7 @@ public class LoginUI {
 
         // Action pour le bouton d'inscription
         registerButton.setOnAction(e -> {
-            mainLayout.setContent(new RegisterUI(mainLayout).getView());
+            mainLayout.setContent(new RegisterPage(mainLayout).getView());
         });
 
         // Disposition des éléments

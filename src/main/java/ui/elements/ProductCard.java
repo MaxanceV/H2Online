@@ -14,7 +14,7 @@ import javafx.scene.text.TextAlignment;
 import models.Product;
 import tools.CartUtils;
 import tools.SessionManager;
-import ui.pages.ProductDetail;
+import ui.pages.ProductDetailPage;
 
 public class ProductCard extends VBox {
 
@@ -41,7 +41,7 @@ public class ProductCard extends VBox {
         productImageView.setOnMouseClicked(e -> {
             MainLayout mainLayout = SessionManager.getMainLayout();
             if (mainLayout != null) {
-                ProductDetail detailPage = new ProductDetail(product);
+                ProductDetailPage detailPage = new ProductDetailPage(product);
                 mainLayout.setContent(detailPage.getView());
             } else {
                 System.err.println("Error: MainLayout is not initialized!");

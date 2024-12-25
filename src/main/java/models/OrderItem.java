@@ -59,12 +59,44 @@ public class OrderItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-        // Vérifiez que unitPrice n'est pas null avant d'appeler updateSubtotalPrice
-//        System.out.println("id : " + productId + " unitprice : " + unitPrice + " quantity : " + quantity);
+
+        // Vérifier si unitPrice est null
+        if (this.unitPrice == null) {
+            try (Connection connection = DBconnection.getConnection()) {
+                // Vérifier si le unitPrice existe dans OrderItem
+                String queryOrderItem = "SELECT unit_price FROM orderitems WHERE order_item_id = ?";
+                try (PreparedStatement stmt = connection.prepareStatement(queryOrderItem)) {
+                    stmt.setInt(1, this.getOrderItemId());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            this.unitPrice = rs.getBigDecimal("unit_price");
+                        }
+                    }
+                }
+
+                // Si toujours null, récupérer depuis la table products
+                if (this.unitPrice == null) {
+                    String queryProduct = "SELECT price FROM products WHERE product_id = ?";
+                    try (PreparedStatement stmt = connection.prepareStatement(queryProduct)) {
+                        stmt.setInt(1, this.getProductId());
+                        try (ResultSet rs = stmt.executeQuery()) {
+                            if (rs.next()) {
+                                this.unitPrice = rs.getBigDecimal("price");
+                            }
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Error: Unable to retrieve unit price for product ID " + this.getProductId());
+            }
+        }
+
+        // Mettre à jour le prix total si unitPrice est défini
         if (this.unitPrice != null) {
             updateSubtotalPrice();
         } else {
-            System.out.println("Warning: unitPrice is null. Cannot update subtotal price.");
+            System.out.println("Warning: unitPrice is still null. Cannot update subtotal price.");
         }
     }
 

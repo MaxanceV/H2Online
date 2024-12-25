@@ -18,53 +18,49 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import models.Order;
-import models.OrderItem;
+import models.User;
 import tools.SessionManager;
 import ui.pages.CartPage;
 import ui.pages.CatalogPage;
-import ui.pages.LoginUI;
+import ui.pages.LoginPage;
+import ui.pages.ManageUsersPage;
 import ui.pages.OrderHistoryPage;
-import ui.pages.RegisterUI;
-import ui.pages.UserSettingsUI;
+import ui.pages.UserSettingsPage;
 
 public class MainLayout {
-    private StackPane rootPane; // Conteneur principal pour les superpositions
-    private BorderPane root; // Layout principal
-    private Scene scene;     // Scène de l'application
-    private MenuButton profileMenuButton; // Menu déroulant pour le profil
-    private StackPane cartButton; // Bouton Panier
-    private Label catalogButton; // Bouton Catalog
-    private Text cartBadge; // Pastille rouge pour le nombre d’articles
-    
+    private StackPane rootPane;
+    private BorderPane root;
+    private Scene scene;
+    private MenuButton profileMenuButton;
+    private MenuButton adminMenuButton; // Nouveau menu pour les tâches Admin
+    private StackPane cartButton;
+    private Label catalogButton;
+    private Text cartBadge;
 
     public MainLayout(Stage primaryStage) {
-        // Initialiser le conteneur principal et le layout principal
         rootPane = new StackPane();
         root = new BorderPane();
-        rootPane.getChildren().add(root); // Ajouter le BorderPane comme enfant du StackPane
+        rootPane.getChildren().add(root);
 
         createHeader(primaryStage);
         createFooter();
-        
-        scene = new Scene(rootPane, 800, 600); // Taille par défaut
+
+        scene = new Scene(rootPane, 800, 600);
     }
-    
 
-
-    // Création du header
     private void createHeader(Stage primaryStage) {
-        BorderPane header = new BorderPane(); // Conteneur pour le header
-        header.setStyle("-fx-background-color: #333333; -fx-padding: 5;"); // Style global du header
+        BorderPane header = new BorderPane();
+        header.setStyle("-fx-background-color: #333333; -fx-padding: 5;");
 
         // Logo et titre (à gauche)
-        HBox leftSection = new HBox(10); // Espacement entre le logo et le titre
+        HBox leftSection = new HBox(10);
         leftSection.setAlignment(Pos.CENTER_LEFT);
 
         Image logoImage = new Image(getClass().getResourceAsStream("/images/logo/logo_goutte.png"));
         ImageView logo = new ImageView(logoImage);
-        logo.setFitWidth(50); // Taille adaptée
-        logo.setFitHeight(50); // Taille adaptée pour un alignement parfait avec le titre
-        logo.setPreserveRatio(true); // Conserver les proportions
+        logo.setFitWidth(50);
+        logo.setFitHeight(50);
+        logo.setPreserveRatio(true);
 
         Label siteName = new Label("H2Online");
         siteName.setStyle("-fx-text-fill: white; -fx-font-size: 20px; -fx-padding: 0;");
@@ -81,7 +77,7 @@ public class MainLayout {
         centerSection.getChildren().add(catalogButton);
 
         // Boutons Panier et Profil (à droite)
-        HBox rightSection = new HBox(10); // Espacement entre les deux boutons
+        HBox rightSection = new HBox(10);
         rightSection.setAlignment(Pos.CENTER_RIGHT);
 
         // Bouton Panier
@@ -91,14 +87,12 @@ public class MainLayout {
         cartIcon.setFitHeight(30);
         cartButton.getChildren().add(cartIcon);
 
-     // Ajouter la pastille rouge
-        cartBadge = new Text("0"); // Nombre d’articles (par défaut 0)
+        cartBadge = new Text("0");
         cartBadge.setStyle("-fx-fill: red; -fx-font-weight: bold; -fx-font-size: 14px;");
         StackPane.setAlignment(cartBadge, Pos.TOP_RIGHT);
-        cartBadge.setVisible(false); // Masquer la pastille par défaut
+        cartBadge.setVisible(false);
         cartButton.getChildren().add(cartBadge);
 
-        // Action du bouton Panier
         cartButton.setOnMouseClicked(e -> setContent(new CartPage().getView()));
 
         // Menu déroulant pour le profil
@@ -107,34 +101,57 @@ public class MainLayout {
         profileIcon.setFitWidth(30);
         profileIcon.setFitHeight(30);
         profileMenuButton.setGraphic(profileIcon);
-        
+
         MenuItem orderHistory = new MenuItem("Order History");
         orderHistory.setOnAction(e -> setContent(new OrderHistoryPage().getView()));
 
         MenuItem userSettingsItem = new MenuItem("User Settings");
-        userSettingsItem.setOnAction(e -> setContent(new UserSettingsUI().getView()));
+        userSettingsItem.setOnAction(e -> setContent(new UserSettingsPage().getView()));
 
         MenuItem logoutItem = new MenuItem("Logout");
         logoutItem.setOnAction(e -> {
             System.out.println("Déconnexion...");
             SessionManager.clearSession();
-            disableMenu(); // Désactiver le menu après déconnexion
-            setContent(new LoginUI(this).getView());
+            disableMenu();
+            setContent(new LoginPage(this).getView());
         });
 
         profileMenuButton.getItems().addAll(orderHistory, userSettingsItem, logoutItem);
 
-        rightSection.getChildren().addAll(cartButton, profileMenuButton);
+        // Menu déroulant pour les tâches Admin (visible uniquement pour les admins)
+        adminMenuButton = new MenuButton("Admin Tasks");
+        adminMenuButton.setStyle("-fx-text-fill: white;");
+        adminMenuButton.setVisible(false); // Par défaut, caché
 
-        // Ajouter les sections au BorderPane
+        MenuItem manageOrders = new MenuItem("Manage Orders");
+        manageOrders.setOnAction(e -> {
+            // Logique pour accéder à la page de gestion des commandes
+            System.out.println("Navigating to Manage Orders Page");
+        });
+
+        MenuItem manageProducts = new MenuItem("Manage Products");
+        manageProducts.setOnAction(e -> {
+            // Logique pour accéder à la page de gestion des produits
+            System.out.println("Navigating to Manage Products Page");
+        });
+
+        MenuItem manageUsers = new MenuItem("Manage Users");
+        manageUsers.setOnAction(e -> {
+            setContent(new ManageUsersPage().getView());
+        });
+
+        adminMenuButton.getItems().addAll(manageOrders, manageProducts, manageUsers);
+
+        // Ajouter les boutons au panneau de droite
+        rightSection.getChildren().addAll(cartButton, profileMenuButton, adminMenuButton);
+
         header.setLeft(leftSection);
         header.setCenter(centerSection);
         header.setRight(rightSection);
 
-        root.setTop(header); // Ajouter le header au layout principal
+        root.setTop(header);
     }
 
-    // Création du footer
     private void createFooter() {
         HBox footer = new HBox();
         footer.setAlignment(Pos.CENTER);
@@ -147,70 +164,68 @@ public class MainLayout {
         root.setBottom(footer);
     }
 
-    // Mettre à jour le contenu central
-    public void setContent(Node content) {
-        root.setCenter(content);
-    }
-
-    // Obtenir la scène
-    public Scene getScene() {
-        return scene;
-    }
-
-    // Obtenir le StackPane (par exemple pour les notifications)
-    public StackPane getRootPane() {
-        return rootPane;
-    }
-
-    // Activer les boutons lorsque l'utilisateur est connecté
     public void enableMenu() {
         profileMenuButton.setDisable(false);
         profileMenuButton.setVisible(true);
         cartButton.setVisible(true);
         catalogButton.setVisible(true);
         initializeCartBadge();
+
+        // Rendre le menu Admin Tasks visible si l'utilisateur est un admin
+        User currentUser = SessionManager.getCurrentUser();
+        if (currentUser != null && currentUser.isAdmin()) {
+            adminMenuButton.setVisible(true);
+        }
     }
 
-    // Désactiver les boutons lorsque l'utilisateur est déconnecté
     public void disableMenu() {
         profileMenuButton.setDisable(true);
         profileMenuButton.setVisible(false);
         cartButton.setVisible(false);
         catalogButton.setVisible(false);
+        adminMenuButton.setVisible(false); // Cacher le menu Admin Tasks
     }
-    
-    //méthode pour mettre à jour le badge
+
+    public void setContent(Node content) {
+        root.setCenter(content);
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    public StackPane getRootPane() {
+        return rootPane;
+    }
+
     public void updateCartBadge(int itemCount) {
         if (itemCount > 0) {
             cartBadge.setText(String.valueOf(itemCount));
             cartBadge.setVisible(true);
         } else {
-            cartBadge.setVisible(false); // Masquer le badge si aucun article
+            cartBadge.setVisible(false);
         }
     }
-    
- // Méthode pour initialiser la pastille rouge au chargement
+
     private void initializeCartBadge() {
-        int userId = SessionManager.getCurrentUser().getId(); // Obtenir l'ID utilisateur
+        int userId = SessionManager.getCurrentUser().getId();
         OrderDAO orderDAO = new OrderDAO();
         OrderItemDAO orderItemDAO = new OrderItemDAO();
 
         try {
-            // Vérifier si une commande "in progress" existe pour l'utilisateur
             Order inProgressOrder = orderDAO.getInProgressOrder(userId);
             if (inProgressOrder != null) {
-                // Calculer le total des quantités dans la commande
                 int totalItems = orderItemDAO.getOrderItems(inProgressOrder.getOrderId())
                         .stream()
-                        .mapToInt(OrderItem::getQuantity)
+                        .mapToInt(orderItem -> orderItem.getQuantity())
                         .sum();
-                updateCartBadge(totalItems); // Mettre à jour la pastille avec le total
+                updateCartBadge(totalItems);
             } else {
-                updateCartBadge(0); // Pas de commande "in progress", afficher 0
+                updateCartBadge(0);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            updateCartBadge(0); // En cas d'erreur, afficher 0
+            updateCartBadge(0);
         }
     }
 }

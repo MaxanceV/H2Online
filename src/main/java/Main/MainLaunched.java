@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import tools.SessionManager;
 import ui.elements.MainLayout;
-import ui.pages.LoginUI;
+import ui.pages.LoginPage;
 
 public class MainLaunched extends Application {
 
@@ -17,7 +17,7 @@ public class MainLaunched extends Application {
 	    SessionManager.setMainLayout(mainLayout);
 
 	    // Définir la page de connexion comme contenu initial
-	    mainLayout.setContent(new LoginUI(mainLayout).getView());
+	    mainLayout.setContent(new LoginPage(mainLayout).getView());
 
 	    // Désactiver le menu par défaut (pas connecté)
 	    mainLayout.disableMenu();
