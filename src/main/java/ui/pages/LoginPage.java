@@ -32,6 +32,8 @@ public class LoginPage {
         loginButton.setOnAction(e -> {
             try {
                 UserDAO userDAO = new UserDAO();
+                //System.out.println("Raw password entered: " + passwordField.getText()); // Log ajouté
+
                 User user = userDAO.validateUser(emailField.getText(), passwordField.getText());
                 if (user != null) {
                     System.out.println("Connexion réussie : " + user.getFirstName());
@@ -45,6 +47,7 @@ public class LoginPage {
                 ex.printStackTrace();
             }
         });
+
 
         // Action pour le bouton d'inscription
         registerButton.setOnAction(e -> {

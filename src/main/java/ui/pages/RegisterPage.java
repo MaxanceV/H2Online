@@ -73,6 +73,8 @@ public class RegisterPage {
             UserDAO userDAO = new UserDAO();
             try {
                 if (!userDAO.emailExists(emailField.getText())) {
+                    //System.out.println("Raw password before hashing: " + passwordField.getText());
+
                     // Créer un nouvel utilisateur
                     User newUser = new User(
                         0, // ID auto-incrémenté
@@ -82,6 +84,7 @@ public class RegisterPage {
                         PasswordManager.hashPassword(passwordField.getText()),
                         "customer" // Rôle par défaut
                     );
+                    System.out.println("Password after ashing register in java : " + PasswordManager.hashPassword(passwordField.getText()));
 
                     userDAO.addUser(newUser);
                     System.out.println("Utilisateur inscrit avec succès !");
@@ -94,6 +97,7 @@ public class RegisterPage {
                 errorLabel.setText("Erreur lors de l'inscription. Veuillez réessayer.");
             }
         });
+
 
         cancelButton.setOnAction(e -> {
             mainLayout.setContent(new LoginPage(mainLayout).getView()); // Retour à la page de connexion

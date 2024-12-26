@@ -12,6 +12,9 @@ public class DBconnection {
     static {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl("jdbc:mysql://localhost:3307/h2online?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+        //config.setJdbcUrl("jdbc:mysql://localhost:3307/h2online?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8mb4");
+        //config.setJdbcUrl("jdbc:mysql://localhost:3307/h2online?useSSL=false&serverTimezone=UTC");
+
         config.setUsername("root");
         config.setPassword("root");
         config.setMaximumPoolSize(10); // Nombre maximum de connexions dans le pool

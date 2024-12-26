@@ -23,6 +23,8 @@ import tools.SessionManager;
 import ui.pages.CartPage;
 import ui.pages.CatalogPage;
 import ui.pages.LoginPage;
+import ui.pages.ManageOrdersPage;
+import ui.pages.ManageProductsPage;
 import ui.pages.ManageUsersPage;
 import ui.pages.OrderHistoryPage;
 import ui.pages.UserSettingsPage;
@@ -125,14 +127,12 @@ public class MainLayout {
 
         MenuItem manageOrders = new MenuItem("Manage Orders");
         manageOrders.setOnAction(e -> {
-            // Logique pour accéder à la page de gestion des commandes
-            System.out.println("Navigating to Manage Orders Page");
+        	setContent(new ManageOrdersPage().getView());
         });
 
         MenuItem manageProducts = new MenuItem("Manage Products");
         manageProducts.setOnAction(e -> {
-            // Logique pour accéder à la page de gestion des produits
-            System.out.println("Navigating to Manage Products Page");
+        	setContent(new ManageProductsPage().getView());
         });
 
         MenuItem manageUsers = new MenuItem("Manage Users");

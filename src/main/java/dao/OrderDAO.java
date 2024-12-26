@@ -120,5 +120,28 @@ public class OrderDAO {
         return orders;
     }
 
+    public List<Order> getAllOrders() throws SQLException {
+        String query = "SELECT * FROM orders";
+        List<Order> orders = new ArrayList<>();
+
+        try (Connection connection = DBconnection.getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("order_id"));
+                order.setUserId(rs.getInt("user_id"));
+                order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
+                order.setStatus(rs.getString("status"));
+                order.setTotalPrice(rs.getBigDecimal("total_price"));
+                order.setPaymentMethod(rs.getString("payment_method"));
+
+                orders.add(order);
+            }
+        }
+
+        return orders;
+    }
 
 }
