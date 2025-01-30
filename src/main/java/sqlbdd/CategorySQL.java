@@ -1,4 +1,4 @@
-package dao;
+package sqlbdd;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import models.Category;
 import tools.DBconnection;
 
-public class CategoryDAO {
+public class CategorySQL {
 
     // Ajouter une catégorie
     public void addCategory(Category category) throws SQLException {

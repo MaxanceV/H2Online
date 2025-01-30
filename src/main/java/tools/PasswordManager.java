@@ -10,7 +10,6 @@ public class PasswordManager {
 	        throw new IllegalArgumentException("Password cannot be null");
 	    }
 
-	    // Supprimer les espaces inutiles
 	    password = password.trim();
 
 	    try {

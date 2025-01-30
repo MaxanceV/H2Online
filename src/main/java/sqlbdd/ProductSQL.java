@@ -1,4 +1,4 @@
-package dao;
+package sqlbdd;
 
 import models.Product;
 import tools.DBconnection;
@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductDAO {
+public class ProductSQL {
 
     // Ajouter un produit
     public void addProduct(Product product) throws SQLException {

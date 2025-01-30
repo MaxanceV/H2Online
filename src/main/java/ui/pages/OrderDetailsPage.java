@@ -4,9 +4,6 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
-import dao.OrderItemDAO;
-import dao.ProductDAO;
-import dao.UserDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
@@ -22,6 +19,9 @@ import models.Order;
 import models.OrderItem;
 import models.Product;
 import models.User;
+import sqlbdd.OrderItemSQL;
+import sqlbdd.ProductSQL;
+import sqlbdd.UserSQL;
 import tools.SessionManager;
 
 public class OrderDetailsPage {
@@ -54,7 +54,7 @@ public class OrderDetailsPage {
         customerInfoBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 1; -fx-padding: 10;");
 
         try {
-            UserDAO userDAO = new UserDAO();
+            UserSQL userDAO = new UserSQL();
             User user = userDAO.getUserById(order.getUserId());
 
             Label customerNameLabel = new Label("Customer: " + user.getFirstName() + " " + user.getLastName());
@@ -99,9 +99,9 @@ public class OrderDetailsPage {
 
     private void loadOrderItems(TableView<OrderItemRow> tableView) {
         try {
-            OrderItemDAO orderItemDAO = new OrderItemDAO();
+            OrderItemSQL orderItemDAO = new OrderItemSQL();
             List<OrderItem> orderItems = orderItemDAO.getOrderItems(order.getOrderId());
-            ProductDAO productDAO = new ProductDAO();
+            ProductSQL productDAO = new ProductSQL();
 
             List<OrderItemRow> rows = orderItems.stream().map(orderItem -> {
                 try {

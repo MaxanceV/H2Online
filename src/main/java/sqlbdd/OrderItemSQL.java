@@ -1,4 +1,4 @@
-package dao;
+package sqlbdd;
 
 import models.OrderItem;
 import tools.DBconnection;
@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderItemDAO {
+public class OrderItemSQL {
 
     // Ajoute un nouvel article à une commande
     public void addOrderItem(OrderItem item) throws SQLException {

@@ -1,4 +1,4 @@
-package dao;
+package sqlbdd;
 
 import models.User;
 import tools.DBconnection;
@@ -8,12 +8,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO {
+public class UserSQL {
 
     // Ajouter un utilisateur
 	public void addUser(User user) throws SQLException {
 	    String hashedPassword = user.getPassword();
-	    //System.out.println("Hashed password being saved: " + hashedPassword); // Ajout de log
 
 	    String query = "INSERT INTO users (first_name, last_name, email, phone_number, address, city, postal_code, country, password, role) " +
 	                   "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

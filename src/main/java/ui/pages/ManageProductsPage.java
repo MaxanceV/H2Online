@@ -1,6 +1,5 @@
 package ui.pages;
 
-import dao.ProductDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -15,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.Product;
+import sqlbdd.ProductSQL;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -31,7 +31,7 @@ public class ManageProductsPage {
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         tableView = new TableView<>();
-        tableView.setEditable(true); // Enable table editing
+        tableView.setEditable(true); 
 
         VBox topBox = new VBox(10);
         topBox.setPadding(new Insets(10));
@@ -40,7 +40,6 @@ public class ManageProductsPage {
         layout.setTop(topBox);
         layout.setCenter(createTable());
 
-        // Add a Save Changes button
         Button saveChangesButton = new Button("Save Changes");
         saveChangesButton.setOnAction(e -> saveChanges());
         saveChangesButton.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-font-size: 14px;");
@@ -101,7 +100,6 @@ public class ManageProductsPage {
         TableColumn<ProductRow, String> priceColumn = createEditableColumn("Price (€)", ProductRow::priceProperty, true);
         TableColumn<ProductRow, String> stockColumn = createEditableColumn("Stock", ProductRow::stockProperty, true);
 
-        // Action column for Delete
         TableColumn<ProductRow, Void> actionColumn = new TableColumn<>("Actions");
         actionColumn.setCellFactory(param -> new TableCell<ProductRow, Void>() {
             private final Button deleteButton = new Button("Delete");
@@ -152,7 +150,7 @@ public class ManageProductsPage {
     }
 
     private void loadProducts() {
-        ProductDAO productDAO = new ProductDAO();
+        ProductSQL productDAO = new ProductSQL();
         try {
             List<Product> products = productDAO.getAllProducts();
             List<ProductRow> productRows = products.stream().map(ProductRow::new).toList();
@@ -163,7 +161,7 @@ public class ManageProductsPage {
     }
 
     private void saveChanges() {
-        ProductDAO productDAO = new ProductDAO();
+        ProductSQL productDAO = new ProductSQL();
         try {
             for (ProductRow productRow : tableView.getItems()) {
                 Product product = productRow.toProduct();
@@ -185,7 +183,7 @@ public class ManageProductsPage {
     }
 
     private void deleteProduct(ProductRow productRow) {
-        ProductDAO productDAO = new ProductDAO();
+        ProductSQL productDAO = new ProductSQL();
         try {
             productDAO.deleteProduct(productRow.toProduct().getProductId());
             tableView.getItems().remove(productRow);
@@ -241,7 +239,7 @@ public class ManageProductsPage {
                 product.setPrice(new BigDecimal(priceField.getText()));
                 product.setStockQuantity(Integer.parseInt(stockField.getText()));
 
-                ProductDAO productDAO = new ProductDAO();
+                ProductSQL productDAO = new ProductSQL();
                 productDAO.addProduct(product);
 
                 loadProducts();

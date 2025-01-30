@@ -1,4 +1,4 @@
-package dao;
+package sqlbdd;
 
 import models.Order;
 import models.OrderItem;
@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderDAO {
+public class OrderSQL {
 
     // Méthode pour créer une nouvelle commande "in progress"
     public int createNewOrder(int userId) throws SQLException {
@@ -21,7 +21,7 @@ public class OrderDAO {
 
             ResultSet keys = statement.getGeneratedKeys();
             if (keys.next()) {
-                return keys.getInt(1); // Retourne l'ID de la commande nouvellement créée
+                return keys.getInt(1); 
             } else {
                 throw new SQLException("Failed to retrieve the generated order ID.");
             }
@@ -46,7 +46,7 @@ public class OrderDAO {
                 order.setPaymentMethod(resultSet.getString("payment_method"));
 
                 // Charger les articles associés
-                OrderItemDAO orderItemDAO = new OrderItemDAO();
+                OrderItemSQL orderItemDAO = new OrderItemSQL();
                 order.setOrderItems(orderItemDAO.getOrderItems(order.getOrderId()));
 
                 return order;

@@ -1,4 +1,4 @@
-package dao;
+package sqlbdd;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import models.Brand;
 import tools.DBconnection;
 
-public class BrandDAO {
+public class BrandSQL {
 
     // Ajouter une marque
     public void addBrand(Brand brand) throws SQLException {

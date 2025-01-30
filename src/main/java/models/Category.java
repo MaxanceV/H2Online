@@ -6,18 +6,15 @@ public class Category {
     private String name;
     private String description;
 
-    // Constructeur par défaut
     public Category() {
     }
 
-    // Constructeur avec paramètres
     public Category(int categoryId, String name, String description) {
         this.categoryId = categoryId;
         this.name = name;
         this.description = description;
     }
 
-    // Getters et setters
     public int getCategoryId() {
         return categoryId;
     }

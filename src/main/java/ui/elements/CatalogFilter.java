@@ -1,13 +1,14 @@
 package ui.elements;
 
-import dao.BrandDAO;
-import dao.CategoryDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import sqlbdd.BrandSQL;
+import sqlbdd.CategorySQL;
+
 import org.controlsfx.control.RangeSlider;
 
 import java.sql.SQLException;
@@ -16,14 +17,13 @@ import java.util.List;
 public class CatalogFilter {
     private GridPane view;
 
-    // Composants de filtrage
     private TextField searchField;
     private Button searchButton;
-    private ScrollPane brandFilterScrollPane; // Zone de défilement pour les marques
-    private VBox brandFilter; // Contiendra les CheckBoxes pour les marques
-    private ScrollPane categoryFilterScrollPane; // Zone de défilement pour les catégories
-    private VBox categoryFilter; // Contiendra les CheckBoxes pour les catégories
-    private RangeSlider priceRangeSlider; // Slider pour plage de prix
+    private ScrollPane brandFilterScrollPane; 
+    private VBox brandFilter; 
+    private ScrollPane categoryFilterScrollPane; 
+    private VBox categoryFilter; 
+    private RangeSlider priceRangeSlider; 
     private RangeSlider volumeRangeSlider;
     private Button applyFiltersButton;
     
@@ -34,7 +34,6 @@ public class CatalogFilter {
         view.setHgap(5);
         view.setVgap(10);
 
-        // Champs de recherche textuelle
         searchField = new TextField();
         searchField.setPromptText("Search products...");
         searchButton = new Button("🔍");
@@ -94,7 +93,7 @@ public class CatalogFilter {
 
     private void loadBrands() {
         try {
-            BrandDAO brandDAO = new BrandDAO();
+            BrandSQL brandDAO = new BrandSQL();
             List<String> brands = brandDAO.getAllBrandNames();
             for (String brand : brands) {
                 CheckBox checkBox = new CheckBox(brand);
@@ -107,7 +106,7 @@ public class CatalogFilter {
 
     private void loadCategories() {
         try {
-            CategoryDAO categoryDAO = new CategoryDAO();
+            CategorySQL categoryDAO = new CategorySQL();
             List<String> categories = categoryDAO.getAllCategoryNames();
             for (String category : categories) {
                 CheckBox checkBox = new CheckBox(category);
@@ -123,11 +122,10 @@ public class CatalogFilter {
         scrollPane.setFitToWidth(true);
         scrollPane.setPrefHeight(height);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Pas de scroll horizontal
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         return scrollPane;
     }
 
-    // Getters pour récupérer les valeurs des filtres
     public String getSearchQuery() {
         return searchField.getText();
     }
@@ -147,11 +145,11 @@ public class CatalogFilter {
     }
 
     public double getMinPrice() {
-        return priceRangeSlider.getLowValue(); // Récupérer la valeur minimale
+        return priceRangeSlider.getLowValue(); 
     }
 
     public double getMaxPrice() {
-        return priceRangeSlider.getHighValue(); // Récupérer la valeur maximale
+        return priceRangeSlider.getHighValue();
     }
 
     public Button getApplyFiltersButton() {

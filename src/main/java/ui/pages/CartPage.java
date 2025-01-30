@@ -1,8 +1,5 @@
 package ui.pages;
 
-import dao.OrderDAO;
-import dao.OrderItemDAO;
-import dao.ProductDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -18,6 +15,9 @@ import javafx.scene.layout.VBox;
 import models.Order;
 import models.OrderItem;
 import models.Product;
+import sqlbdd.OrderSQL;
+import sqlbdd.OrderItemSQL;
+import sqlbdd.ProductSQL;
 import tools.CartUtils;
 import tools.NotificationUtils;
 import tools.SessionManager;
@@ -31,7 +31,7 @@ public class CartPage {
 
     public CartPage() {
         layout = new BorderPane();
-        populateCartContent(); // Ajouter le contenu initial
+        populateCartContent();
     }
 
     public BorderPane getView() {
@@ -40,11 +40,10 @@ public class CartPage {
 
     private void populateCartContent() {
         int userId = SessionManager.getCurrentUser().getId();
-        OrderDAO orderDAO = new OrderDAO();
-        OrderItemDAO orderItemDAO = new OrderItemDAO();
+        OrderSQL orderDAO = new OrderSQL();
+        OrderItemSQL orderItemDAO = new OrderItemSQL();
 
         try {
-            // Obtenir la commande "in progress"
             Order inProgressOrder = orderDAO.getInProgressOrder(userId);
             if (inProgressOrder == null) {
                 layout.setCenter(new Label("Your cart is empty."));
@@ -53,7 +52,6 @@ public class CartPage {
 
             List<OrderItem> orderItems = orderItemDAO.getOrderItems(inProgressOrder.getOrderId());
 
-            // Partie gauche : Liste des articles du panier
             VBox cartItemsBox = new VBox(10);
             cartItemsBox.setPadding(new Insets(10));
             cartItemsBox.setAlignment(Pos.TOP_LEFT);
@@ -69,10 +67,9 @@ public class CartPage {
 
             ScrollPane scrollPane = new ScrollPane(cartItemsBox);
             scrollPane.setFitToWidth(true);
-            scrollPane.setFitToHeight(true); // Activer le défilement si nécessaire
+            scrollPane.setFitToHeight(true); 
             layout.setLeft(scrollPane);
 
-            // Partie droite : Résumé total et bouton de validation
             VBox totalBox = createTotalSummaryBox(inProgressOrder, orderItemDAO);
             layout.setRight(totalBox);
 
@@ -81,26 +78,23 @@ public class CartPage {
         }
     }
 
-    private HBox createCartItemRow(OrderItem item, OrderItemDAO orderItemDAO, OrderDAO orderDAO) throws SQLException {
+    private HBox createCartItemRow(OrderItem item, OrderItemSQL orderItemDAO, OrderSQL orderDAO) throws SQLException {
         HBox itemRow = new HBox(15);
         itemRow.setAlignment(Pos.CENTER_LEFT);
         itemRow.setPadding(new Insets(10));
         itemRow.setStyle("-fx-border-color: black; -fx-border-width: 1;");
 
-        // Récupérer les détails du produit
-        ProductDAO productDAO = new ProductDAO();
+        ProductSQL productDAO = new ProductSQL();
         Product product = productDAO.getProductById(item.getProductId());
 
         if (product == null) {
             throw new SQLException("Product not found for item with ID: " + item.getOrderItemId());
         }
 
-        // Image du produit
         ImageView productImage = new ImageView(new Image(getClass().getResourceAsStream("/images/products/" + product.getImage())));
         productImage.setFitWidth(100);
         productImage.setPreserveRatio(true);
 
-        // Informations sur le produit
         VBox productInfoBox = new VBox(5);
         productInfoBox.setAlignment(Pos.TOP_LEFT);
 
@@ -116,7 +110,6 @@ public class CartPage {
 
         productInfoBox.getChildren().addAll(productName, description, volume);
 
-        // Sélecteur de quantité
         VBox quantityBox = new VBox(3);
         quantityBox.setAlignment(Pos.CENTER);
 
@@ -124,7 +117,7 @@ public class CartPage {
         Spinner<Integer> quantitySpinner = new Spinner<>();
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, product.getStockQuantity(), item.getQuantity());
         quantitySpinner.setValueFactory(valueFactory);
-        quantitySpinner.setMaxWidth(70); // Réduire la largeur du spinner
+        quantitySpinner.setMaxWidth(70);
 
         Button updateQuantityButton = new Button();
         ImageView editIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/logo/edit.png")));
@@ -144,7 +137,6 @@ public class CartPage {
 
         quantityBox.getChildren().addAll(quantityLabel, quantitySpinner, updateQuantityButton);
 
-        // Sous-total
         VBox subtotalBox = new VBox(3);
         subtotalBox.setAlignment(Pos.CENTER);
 
@@ -152,7 +144,6 @@ public class CartPage {
         Label subtotalPrice = new Label(item.getSubtotalPrice() + " €");
         subtotalBox.getChildren().addAll(subtotalText, subtotalPrice);
 
-        // Bouton de suppression
         Button deleteButton = new Button();
         ImageView binIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/logo/bin.png")));
         binIcon.setFitWidth(20);
@@ -174,12 +165,11 @@ public class CartPage {
         return itemRow;
     }
 
-    private VBox createTotalSummaryBox(Order inProgressOrder, OrderItemDAO orderItemDAO) throws SQLException {
+    private VBox createTotalSummaryBox(Order inProgressOrder, OrderItemSQL orderItemDAO) throws SQLException {
         VBox totalBox = new VBox(10);
         totalBox.setAlignment(Pos.TOP_RIGHT);
         totalBox.setPadding(new Insets(20));
 
-        // Montant total
         BigDecimal totalAmount = orderItemDAO.getOrderItems(inProgressOrder.getOrderId())
                 .stream()
                 .map(OrderItem::getSubtotalPrice)
@@ -188,12 +178,10 @@ public class CartPage {
         Label totalLabel = new Label("Total: " + totalAmount + " €");
         totalLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        // Bouton de validation et paiement
         Button validateButton = new Button("Validate and Pay");
         validateButton.setStyle("-fx-font-size: 16px; -fx-background-color: green; -fx-text-fill: white;");
         validateButton.setOnAction(e -> {
             try {
-                // Rediriger vers la nouvelle page OrderValidationPage
                 SessionManager.getMainLayout().setContent(new OrderValidationPage(inProgressOrder).getView());
             } catch (Exception ex) {
                 ex.printStackTrace();

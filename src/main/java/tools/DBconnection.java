@@ -17,10 +17,10 @@ public class DBconnection {
 
         config.setUsername("root");
         config.setPassword("root");
-        config.setMaximumPoolSize(10); // Nombre maximum de connexions dans le pool
-        config.setMinimumIdle(2); // Nombre minimum de connexions inactives
-        config.setIdleTimeout(30000); // Temps d'inactivité avant fermeture (30 sec)
-        config.setMaxLifetime(1800000); // Durée de vie maximale d'une connexion (30 min)
+        config.setMaximumPoolSize(10); 
+        config.setMinimumIdle(2); 
+        config.setIdleTimeout(30000); 
+        config.setMaxLifetime(1800000);
         dataSource = new HikariDataSource(config);
     }
 

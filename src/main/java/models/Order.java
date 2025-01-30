@@ -13,7 +13,6 @@ public class Order {
     private String paymentMethod;
     private List<OrderItem> orderItems;
 
-    // Constructeurs
     public Order() {}
 
     public Order(int orderId, int userId, LocalDateTime orderDate, String status, BigDecimal totalPrice, String paymentMethod) {
@@ -25,7 +24,6 @@ public class Order {
         this.paymentMethod = paymentMethod;
     }
 
-    // Getters et Setters
     public int getOrderId() {
         return orderId;
     }
@@ -82,7 +80,6 @@ public class Order {
         this.orderItems = orderItems;
     }
 
-    // Méthodes utilitaires
     public void addOrderItem(OrderItem item) {
         this.orderItems.add(item);
         updateTotalPrice();

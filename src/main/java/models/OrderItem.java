@@ -16,7 +16,6 @@ public class OrderItem {
     private BigDecimal unitPrice;
     private BigDecimal subtotalPrice;
 
-    // Constructeurs
     public OrderItem() {}
 
     public OrderItem(int orderItemId, int orderId, int productId, int quantity, BigDecimal unitPrice, BigDecimal subtotalPrice) {
@@ -28,7 +27,6 @@ public class OrderItem {
         this.subtotalPrice = subtotalPrice;
     }
 
-    // Getters et Setters
     public int getOrderItemId() {
         return orderItemId;
     }
@@ -120,7 +118,6 @@ public class OrderItem {
 
     // Méthode pour mettre à jour le prix total de cet article
     public void updateSubtotalPrice() {
-//    	System.out.println("id : " + productId + " unitprice : " + unitPrice + " quantity : " + quantity);
         if (this.unitPrice != null && this.quantity > 0) {
             this.subtotalPrice = this.unitPrice.multiply(new BigDecimal(this.quantity));
         } else {
@@ -129,7 +126,6 @@ public class OrderItem {
     }
     
     public String getProductName() throws SQLException {
-        // On suppose que chaque OrderItem a un productId
         String query = "SELECT name FROM products WHERE product_id = ?";
         try (Connection connection = DBconnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {

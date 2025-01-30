@@ -1,6 +1,5 @@
 package ui.pages;
 
-import dao.UserDAO;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import models.User;
+import sqlbdd.UserSQL;
 import tools.SessionManager;
 import ui.elements.MainLayout;
 
@@ -20,28 +20,26 @@ public class LoginPage {
     }
 
     public VBox getView() {
-        Text title = new Text("Connexion");
+        Text title = new Text("Log in");
         TextField emailField = new TextField();
         emailField.setPromptText("Email");
         PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Mot de passe");
-        Button loginButton = new Button("Se connecter");
-        Button registerButton = new Button("Créer un compte");
+        passwordField.setPromptText("Password");
+        Button loginButton = new Button("Log in");
+        Button registerButton = new Button("Create an account");
 
-        // Action pour le bouton de connexion
         loginButton.setOnAction(e -> {
             try {
-                UserDAO userDAO = new UserDAO();
-                //System.out.println("Raw password entered: " + passwordField.getText()); // Log ajouté
-
+                UserSQL userDAO = new UserSQL();
+               
                 User user = userDAO.validateUser(emailField.getText(), passwordField.getText());
                 if (user != null) {
-                    System.out.println("Connexion réussie : " + user.getFirstName());
+                    System.out.println("Login successful : " + user.getFirstName());
                     SessionManager.setCurrentUser(user);
-                    mainLayout.enableMenu(); // Activer le menu après connexion
+                    mainLayout.enableMenu(); 
                     mainLayout.setContent(new CatalogPage().getView());
                 } else {
-                    System.out.println("Identifiants incorrects !");
+                    System.out.println("Incorrect credentials !");
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -49,12 +47,11 @@ public class LoginPage {
         });
 
 
-        // Action pour le bouton d'inscription
+
         registerButton.setOnAction(e -> {
             mainLayout.setContent(new RegisterPage(mainLayout).getView());
         });
 
-        // Disposition des éléments
         VBox layout = new VBox(10, title, emailField, passwordField, loginButton, registerButton);
         layout.setAlignment(Pos.CENTER);
         return layout;

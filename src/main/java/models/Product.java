@@ -7,8 +7,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import dao.BrandDAO;
-import dao.CategoryDAO;
+import sqlbdd.BrandSQL;
+import sqlbdd.CategorySQL;
 import tools.DBconnection;
 
 public class Product {
@@ -22,12 +22,11 @@ public class Product {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     
-    private BrandDAO brandDAO = new BrandDAO();
-    private CategoryDAO categoryDAO = new CategoryDAO();
+    private BrandSQL brandDAO = new BrandSQL();
+    private CategorySQL categoryDAO = new CategorySQL();
     private List<String> brands = new ArrayList<>();
     private List<String> categories = new ArrayList<>();
 
-    // Constructeurs
     public Product() {}
 
     public Product(int productId, String name, BigDecimal volumePerBottle, String description, 
@@ -43,7 +42,6 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
-    // Getters et setters
     public int getProductId() {
         return productId;
     }
@@ -116,34 +114,6 @@ public class Product {
         this.updatedAt = updatedAt;
     }
     
-//    public List<String> getBrands() {
-//        if (brands == null) { // Charger une seule fois
-//            brands = new ArrayList<>();
-//            try (Connection connection = DBconnection.getConnection()) {
-//                BrandDAO brandDAO = new BrandDAO();
-//                brands = brandDAO.getBrandsByProductId(productId); // Retourne une liste
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        return brands;
-//    }
-//
-//    public List<String> getCategories() {
-//        if (categories == null) { // Charger une seule fois
-//            categories = new ArrayList<>();
-//            try (Connection connection = DBconnection.getConnection()) {
-//                CategoryDAO categoryDAO = new CategoryDAO();
-//                categories = categoryDAO.getCategoriesByProductId(productId); // Retourne une liste
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        return categories;
-//    }
-//    
-
-
     public List<String> getBrands() {
         if (brands == null) {
             brands = brandDAO.getBrandsByProductId(productId);
@@ -160,8 +130,6 @@ public class Product {
         return categories;
     }
 
-
-
     public void setBrands(List<String> brands) {
         this.brands = brands;
     }
@@ -172,11 +140,11 @@ public class Product {
     
     public void reloadDetails() {
         if (brands == null || brands.isEmpty()) {
-            BrandDAO brandDAO = new BrandDAO();
+            BrandSQL brandDAO = new BrandSQL();
             this.brands = brandDAO.getBrandsByProductId(productId);
         }
         if (categories == null || categories.isEmpty()) {
-            CategoryDAO categoryDAO = new CategoryDAO();
+            CategorySQL categoryDAO = new CategorySQL();
             this.categories = categoryDAO.getCategoriesByProductId(productId);
         }
     }

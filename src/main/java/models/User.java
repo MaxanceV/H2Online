@@ -13,7 +13,6 @@ public class User {
     private String password; // Stocker le hash du mot de passe
     private String role; // "customer" ou "admin"
 
-    // Constructeurs
     public User() {
     }
 
@@ -42,7 +41,6 @@ public class User {
         this.role = role;
     }
 
-    // Getters et setters
     public int getId() {
         return id;
     }

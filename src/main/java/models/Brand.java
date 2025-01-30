@@ -5,18 +5,15 @@ public class Brand {
     private String name;
     private String description;
 
-    // Constructeur par défaut
     public Brand() {
     }
 
-    // Constructeur avec paramètres
     public Brand(int brandId, String name, String description) {
         this.brandId = brandId;
         this.name = name;
         this.description = description;
     }
 
-    // Getters et setters
     public int getBrandId() {
         return brandId;
     }

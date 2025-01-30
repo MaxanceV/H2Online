@@ -17,7 +17,6 @@ public class NotificationUtils {
 
         parent.getChildren().add(notification);
 
-        // Animation pour faire apparaître et disparaître la notification
         FadeTransition fadeIn = new FadeTransition(Duration.seconds(0.5), notification);
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);

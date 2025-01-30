@@ -3,10 +3,6 @@ package ui.pages;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 
-import dao.InvoiceDAO;
-import dao.OrderDAO;
-import dao.OrderItemDAO;
-import dao.UserDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -20,6 +16,10 @@ import javafx.scene.layout.VBox;
 import models.Order;
 import models.OrderItem;
 import models.User;
+import sqlbdd.InvoiceSQL;
+import sqlbdd.OrderSQL;
+import sqlbdd.OrderItemSQL;
+import sqlbdd.UserSQL;
 import tools.CartUtils;
 import tools.NotificationUtils;
 import tools.SessionManager;
@@ -34,15 +34,12 @@ public class OrderValidationPage {
         contentBox.setPadding(new Insets(20));
         contentBox.setAlignment(Pos.TOP_CENTER);
 
-        // Récupérer l'utilisateur connecté
         User currentUser = SessionManager.getCurrentUser();
 
-        // Adresse : Tout sur une ligne
         Label addressLabel = new Label("Delivery Address:");
-        HBox addressFieldsBox = new HBox(10); // Alignement horizontal pour les champs
+        HBox addressFieldsBox = new HBox(10);
         addressFieldsBox.setAlignment(Pos.CENTER_LEFT);
 
-        // Champs d'adresse
         TextField streetField = new TextField();
         streetField.setPromptText("Street and Number");
         if (currentUser != null && currentUser.getAddress() != null && !currentUser.getAddress().isEmpty()) {
@@ -67,39 +64,33 @@ public class OrderValidationPage {
             countryField.setText(currentUser.getCountry());
         }
 
-        // Ajouter les champs d'adresse à la boîte horizontale
         addressFieldsBox.getChildren().addAll(streetField, cityField, postalCodeField, countryField);
 
-        // Méthode de paiement
         Label paymentLabel = new Label("Select Payment Method:");
         ToggleGroup paymentGroup = new ToggleGroup();
         RadioButton cardOption = new RadioButton("Credit Card");
         RadioButton paypalOption = new RadioButton("PayPal");
         cardOption.setToggleGroup(paymentGroup);
         paypalOption.setToggleGroup(paymentGroup);
-        cardOption.setSelected(true); // Option par défaut
+        cardOption.setSelected(true);
 
         VBox paymentBox = new VBox(10, paymentLabel, cardOption, paypalOption);
 
-        // Boutons : Valider la commande et retour au panier
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
 
-        // Bouton "Retour au panier"
         Button backToCartButton = new Button("Back to Cart");
         backToCartButton.setStyle("-fx-background-color: gray; -fx-text-fill: white;");
         backToCartButton.setOnAction(e -> {
             SessionManager.getMainLayout().setContent(new CartPage().getView());
         });
 
-        // Bouton "Valider la commande"
         Button validateButton = new Button("Validate Order");
         validateButton.setStyle("-fx-background-color: green; -fx-text-fill: white;");
         validateButton.setOnAction(e -> validateOrder(order, streetField.getText(), cityField.getText(), postalCodeField.getText(), countryField.getText(), paymentGroup));
 
         buttonBox.getChildren().addAll(backToCartButton, validateButton);
 
-        // Ajouter tous les éléments au VBox principal
         contentBox.getChildren().addAll(
             addressLabel,
             addressFieldsBox,
@@ -123,7 +114,6 @@ public class OrderValidationPage {
         String selectedPaymentMethod = ((RadioButton) paymentGroup.getSelectedToggle()).getText();
 
         try {
-            // Vérifier la disponibilité des produits
             boolean isCartValid = CartUtils.checkProductAvailability(order);
 
             if (!isCartValid) {
@@ -133,35 +123,29 @@ public class OrderValidationPage {
                 return;
             }
 
-            // Mettre à jour l'adresse de l'utilisateur
             User currentUser = SessionManager.getCurrentUser();
             currentUser.setAddress(street);
             currentUser.setCity(city);
             currentUser.setPostalCode(postalCode);
             currentUser.setCountry(countryField);
 
-            UserDAO userDAO = new UserDAO();
+            UserSQL userDAO = new UserSQL();
             userDAO.updateUser(currentUser);
 
-            // Passer la commande en statut "validated"
             order.setStatus("validated");
-            new OrderDAO().updateOrderStatus(order.getOrderId(), "validated");
+            new OrderSQL().updateOrderStatus(order.getOrderId(), "validated");
 
-            // Générer la facture
-            BigDecimal totalAmount = new OrderItemDAO().getOrderItems(order.getOrderId())
+            BigDecimal totalAmount = new OrderItemSQL().getOrderItems(order.getOrderId())
                     .stream()
                     .map(OrderItem::getSubtotalPrice)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            new InvoiceDAO().generateInvoice(order.getOrderId(), totalAmount);
+            new InvoiceSQL().generateInvoice(order.getOrderId(), totalAmount);
 
-            // Réinitialiser le compteur du panier
             SessionManager.getMainLayout().updateCartBadge(0);
 
-            // Afficher la notification de succès
             NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
                     "Order validated and invoice generated successfully!", true);
 
-            // Rediriger vers la page de récapitulatif des commandes
             SessionManager.getMainLayout().setContent(new OrderHistoryPage().getView());
         } catch (SQLException ex) {
             ex.printStackTrace();

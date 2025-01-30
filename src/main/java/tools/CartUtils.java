@@ -1,11 +1,11 @@
 package tools;
 
-import dao.OrderDAO;
-import dao.OrderItemDAO;
-import dao.ProductDAO;
 import models.Order;
 import models.OrderItem;
 import models.Product;
+import sqlbdd.OrderSQL;
+import sqlbdd.OrderItemSQL;
+import sqlbdd.ProductSQL;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -14,8 +14,8 @@ import java.util.List;
 public class CartUtils {
 
 	public static void addToCart(int userId, Product product, int quantity) {
-	    OrderDAO orderDAO = new OrderDAO();
-	    OrderItemDAO orderItemDAO = new OrderItemDAO();
+	    OrderSQL orderDAO = new OrderSQL();
+	    OrderItemSQL orderItemDAO = new OrderItemSQL();
 
 	    try {
 	        // Vérifier si une commande "in progress" existe
@@ -77,8 +77,8 @@ public class CartUtils {
 	}
 	
 	public static boolean checkProductAvailability(Order order) throws SQLException {
-	    OrderItemDAO orderItemDAO = new OrderItemDAO();
-	    ProductDAO productDAO = new ProductDAO();
+	    OrderItemSQL orderItemDAO = new OrderItemSQL();
+	    ProductSQL productDAO = new ProductSQL();
 
 	    List<OrderItem> orderItems = orderItemDAO.getOrderItems(order.getOrderId());
 	    boolean isCartValid = true;

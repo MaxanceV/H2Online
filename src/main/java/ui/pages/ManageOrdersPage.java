@@ -1,8 +1,5 @@
 package ui.pages;
 
-import dao.InvoiceDAO;
-import dao.OrderDAO;
-import dao.UserDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -15,6 +12,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Order;
 import models.User;
+import sqlbdd.InvoiceSQL;
+import sqlbdd.OrderSQL;
+import sqlbdd.UserSQL;
 import tools.SessionManager;
 
 import java.sql.SQLException;
@@ -31,7 +31,7 @@ public class ManageOrdersPage {
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         tableView = new TableView<>();
-        tableView.setEditable(true); // Autoriser l'édition des colonnes
+        tableView.setEditable(true); 
 
         VBox topBox = new VBox(10);
         topBox.setPadding(new Insets(10));
@@ -145,8 +145,8 @@ public class ManageOrdersPage {
     }
 
     private void loadOrders() {
-        OrderDAO orderDAO = new OrderDAO();
-        UserDAO userDAO = new UserDAO();
+        OrderSQL orderDAO = new OrderSQL();
+        UserSQL userDAO = new UserSQL();
 
         try {
             List<Order> orders = orderDAO.getAllOrders();
@@ -167,7 +167,7 @@ public class ManageOrdersPage {
     }
 
     private void updateOrderStatus(OrderRow orderRow) {
-        OrderDAO orderDAO = new OrderDAO();
+        OrderSQL orderDAO = new OrderSQL();
         try {
             orderDAO.updateOrderStatus(orderRow.getId(), orderRow.getStatus());
             showSuccess("Order status updated successfully.");
@@ -179,16 +179,12 @@ public class ManageOrdersPage {
 
     private void viewOrderDetails(OrderRow orderRow) {
         try {
-            // Récupérer l'Order complet en utilisant l'OrderDAO avec l'ID de la commande
-            OrderDAO orderDAO = new OrderDAO();
+            OrderSQL orderDAO = new OrderSQL();
             Order order = orderDAO.getOrderById(orderRow.getId());
 
-            // Vérifier si l'Order existe
             if (order != null) {
-                // Naviguer vers la page OrderDetailsPage avec l'Order récupéré
                 SessionManager.getMainLayout().setContent(new OrderDetailsPage(order).getView());
             } else {
-                // Afficher une alerte si la commande n'existe pas
                 showError("Order not found. Please try again.");
             }
         } catch (SQLException e) {
@@ -198,7 +194,7 @@ public class ManageOrdersPage {
     }
 
     private void downloadInvoice(int orderId) {
-        InvoiceDAO invoiceDAO = new InvoiceDAO();
+        InvoiceSQL invoiceDAO = new InvoiceSQL();
         invoiceDAO.downloadInvoice(orderId);
     }
 

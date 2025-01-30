@@ -1,6 +1,5 @@
 package ui.pages;
 
-import dao.UserDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -12,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.User;
+import sqlbdd.UserSQL;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 public class ManageUsersPage {
     private BorderPane layout;
     private TableView<UserRow> tableView;
-    private TextField searchField; // Pour stocker le champ de recherche
+    private TextField searchField;
 
     public ManageUsersPage() {
         layout = new BorderPane();
@@ -28,7 +28,7 @@ public class ManageUsersPage {
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         tableView = new TableView<>();
-        tableView.setEditable(true); // Activer l'édition du tableau
+        tableView.setEditable(true); 
 
         VBox topBox = new VBox(10);
         topBox.setPadding(new Insets(10));
@@ -57,11 +57,9 @@ public class ManageUsersPage {
         searchField = new TextField();
         searchField.setPromptText("Type to search...");
 
-        // Ajouter un bouton de recherche
         Button searchButton = new Button("Search");
-        searchButton.setOnAction(e -> applySearchFilter()); // Appliquer le filtre lors du clic
+        searchButton.setOnAction(e -> applySearchFilter()); 
 
-        // Agencer le champ et le bouton dans une boîte horizontale
         HBox searchBar = new HBox(10, searchField, searchButton);
 
         searchBox.getChildren().addAll(searchLabel, searchBar);
@@ -115,9 +113,8 @@ public class ManageUsersPage {
     }
 
     private void deleteUser(UserRow userRow) {
-        UserDAO userDAO = new UserDAO();
+        UserSQL userDAO = new UserSQL();
         try {
-            // Demande de confirmation avant de supprimer
             Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
             confirmationAlert.setTitle("Delete User");
             confirmationAlert.setHeaderText("Are you sure you want to delete this user?");
@@ -160,7 +157,7 @@ public class ManageUsersPage {
     }
 
     private void loadUsers() {
-        UserDAO userDAO = new UserDAO();
+        UserSQL userDAO = new UserSQL();
         try {
             List<User> users = userDAO.getAllUsers();
             List<UserRow> userRows = users.stream().map(UserRow::new).toList();
@@ -173,9 +170,8 @@ public class ManageUsersPage {
     private void applySearchFilter() {
         String filterText = searchField.getText().trim().toLowerCase();
 
-        // Vérifiez si le champ de recherche est vide
         if (filterText.isEmpty()) {
-            loadUsers(); // Recharger tous les utilisateurs si aucun filtre n'est appliqué
+            loadUsers();
         } else {
             FilteredList<UserRow> filteredList = new FilteredList<>(tableView.getItems(), user -> user.matchesFilter(filterText));
             tableView.setItems(filteredList);
@@ -183,7 +179,7 @@ public class ManageUsersPage {
     }
 
     private void saveChanges() {
-        UserDAO userDAO = new UserDAO();
+        UserSQL userDAO = new UserSQL();
         try {
             for (UserRow userRow : tableView.getItems()) {
                 User user = userRow.toUser();
@@ -204,7 +200,6 @@ public class ManageUsersPage {
         }
     }
 
-    // Functional interface for getting StringProperty
     @FunctionalInterface
     private interface UserPropertyGetter {
         StringProperty get(UserRow userRow);
@@ -286,7 +281,7 @@ public class ManageUsersPage {
                     city.get(),
                     postalCode.get(),
                     country.get(),
-                    null, // Password is not editable here
+                    null,
                     role.get()
             );
         }

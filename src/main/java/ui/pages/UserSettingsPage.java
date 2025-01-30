@@ -1,6 +1,5 @@
 package ui.pages;
 
-import dao.UserDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.User;
+import sqlbdd.UserSQL;
 import tools.NotificationUtils;
 import tools.PasswordManager;
 import tools.SessionManager;
@@ -19,11 +19,10 @@ public class UserSettingsPage {
     private User user;
 
     public UserSettingsPage() {
-        this.user = SessionManager.getCurrentUser(); // The currently logged-in user
+        this.user = SessionManager.getCurrentUser();
     }
 
     public VBox getView() {
-        // Form fields
         TextField firstNameField = new TextField(safeString(user.getFirstName()));
         TextField lastNameField = new TextField(safeString(user.getLastName()));
         TextField emailField = new TextField(safeString(user.getEmail()));
@@ -33,12 +32,10 @@ public class UserSettingsPage {
         TextField postalCodeField = new TextField(safeString(user.getPostalCode()));
         TextField countryField = new TextField(safeString(user.getCountry()));
 
-        // Buttons
         Button saveButton = new Button("Save Changes");
         saveButton.setDisable(true); // Disabled by default
         Button changePasswordButton = new Button("Change Password");
 
-        // Form layout
         GridPane form = new GridPane();
         form.setAlignment(Pos.CENTER);
         form.setHgap(10);
@@ -63,11 +60,9 @@ public class UserSettingsPage {
         form.add(saveButton, 0, 8);
         form.add(changePasswordButton, 1, 8);
 
-        // Main container
         VBox layout = new VBox(20, form);
         layout.setAlignment(Pos.CENTER);
 
-        // Enable/disable the save button
         Runnable checkFields = () -> {
             boolean requiredFieldsFilled =
                     !firstNameField.getText().isEmpty() &&
@@ -87,7 +82,6 @@ public class UserSettingsPage {
             saveButton.setDisable(!(requiredFieldsFilled && hasChanges));
         };
 
-        // Add listeners to form fields
         firstNameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
         lastNameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
         emailField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
@@ -97,12 +91,10 @@ public class UserSettingsPage {
         postalCodeField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
         countryField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
 
-        // Button actions
         saveButton.setOnAction(e -> {
             try {
-                UserDAO userDAO = new UserDAO();
+                UserSQL userDAO = new UserSQL();
 
-                // Confirmation before saving
                 Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
                 confirmation.setTitle("Confirm Changes");
                 confirmation.setHeaderText("Save changes?");
@@ -135,13 +127,11 @@ public class UserSettingsPage {
     }
 
     private void openPasswordChangePopup() {
-        // Create a new stage for the popup
         Stage popupStage = new Stage();
         popupStage.setTitle("Change Password");
         popupStage.setResizable(false);
         popupStage.initModality(Modality.APPLICATION_MODAL); // Blocks other windows until closed
 
-        // Password fields
         PasswordField oldPasswordField = new PasswordField();
         oldPasswordField.setPromptText("Current password");
         PasswordField newPasswordField = new PasswordField();
@@ -149,16 +139,13 @@ public class UserSettingsPage {
         PasswordField confirmPasswordField = new PasswordField();
         confirmPasswordField.setPromptText("Confirm new password");
 
-        // Error label
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
 
-        // Buttons
         Button confirmButton = new Button("Confirm");
-        confirmButton.setDisable(true); // Disabled by default
+        confirmButton.setDisable(true);
         Button cancelButton = new Button("Cancel");
 
-        // Layout for the popup content
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -179,7 +166,6 @@ public class UserSettingsPage {
         Scene popupScene = new Scene(content);
         popupStage.setScene(popupScene);
 
-        // Validation logic
         Runnable validateFields = () -> {
             String oldPassword = oldPasswordField.getText();
             String newPassword = newPasswordField.getText();
@@ -198,22 +184,19 @@ public class UserSettingsPage {
         newPasswordField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
         confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
 
-        // Button actions
         confirmButton.setOnAction(e -> {
             try {
-                UserDAO userDAO = new UserDAO();
+                UserSQL userDAO = new UserSQL();
                 String oldPassword = oldPasswordField.getText();
                 String newPassword = newPasswordField.getText();
 
-                // Validate the old password
                 if (PasswordManager.hashPassword(oldPassword).equals(user.getPassword())) {
-                    // Update password
                     user.setPassword(PasswordManager.hashPassword(newPassword));
                     userDAO.updateUser(user);
                     NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
                             "Password changed successfully!", true);
 
-                    popupStage.close(); // Close the popup after successful change
+                    popupStage.close(); 
                 } else {
                     errorLabel.setText("Incorrect current password.");
                 }
@@ -225,7 +208,7 @@ public class UserSettingsPage {
         });
 
         cancelButton.setOnAction(e -> {
-            popupStage.close(); // Close the popup when cancel is clicked
+            popupStage.close();
         });
 
         popupStage.showAndWait();

@@ -2,8 +2,6 @@ package ui.elements;
 
 import java.sql.SQLException;
 
-import dao.OrderDAO;
-import dao.OrderItemDAO;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -19,6 +17,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import models.Order;
 import models.User;
+import sqlbdd.OrderSQL;
+import sqlbdd.OrderItemSQL;
 import tools.SessionManager;
 import ui.pages.CartPage;
 import ui.pages.CatalogPage;
@@ -34,7 +34,7 @@ public class MainLayout {
     private BorderPane root;
     private Scene scene;
     private MenuButton profileMenuButton;
-    private MenuButton adminMenuButton; // Nouveau menu pour les tâches Admin
+    private MenuButton adminMenuButton;
     private StackPane cartButton;
     private Label catalogButton;
     private Text cartBadge;
@@ -54,7 +54,6 @@ public class MainLayout {
         BorderPane header = new BorderPane();
         header.setStyle("-fx-background-color: #333333; -fx-padding: 5;");
 
-        // Logo et titre (à gauche)
         HBox leftSection = new HBox(10);
         leftSection.setAlignment(Pos.CENTER_LEFT);
 
@@ -69,7 +68,6 @@ public class MainLayout {
 
         leftSection.getChildren().addAll(logo, siteName);
 
-        // Bouton Catalog (au centre)
         HBox centerSection = new HBox();
         centerSection.setAlignment(Pos.CENTER);
 
@@ -78,11 +76,9 @@ public class MainLayout {
         catalogButton.setOnMouseClicked(e -> setContent(new CatalogPage().getView()));
         centerSection.getChildren().add(catalogButton);
 
-        // Boutons Panier et Profil (à droite)
         HBox rightSection = new HBox(10);
         rightSection.setAlignment(Pos.CENTER_RIGHT);
 
-        // Bouton Panier
         cartButton = new StackPane();
         ImageView cartIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/logo/pannier.png")));
         cartIcon.setFitWidth(30);
@@ -97,7 +93,6 @@ public class MainLayout {
 
         cartButton.setOnMouseClicked(e -> setContent(new CartPage().getView()));
 
-        // Menu déroulant pour le profil
         profileMenuButton = new MenuButton();
         ImageView profileIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/logo/profil.png")));
         profileIcon.setFitWidth(30);
@@ -120,7 +115,6 @@ public class MainLayout {
 
         profileMenuButton.getItems().addAll(orderHistory, userSettingsItem, logoutItem);
 
-        // Menu déroulant pour les tâches Admin (visible uniquement pour les admins)
         adminMenuButton = new MenuButton("Admin Tasks");
         adminMenuButton.setStyle("-fx-text-fill: white;");
         adminMenuButton.setVisible(false); // Par défaut, caché
@@ -142,7 +136,6 @@ public class MainLayout {
 
         adminMenuButton.getItems().addAll(manageOrders, manageProducts, manageUsers);
 
-        // Ajouter les boutons au panneau de droite
         rightSection.getChildren().addAll(cartButton, profileMenuButton, adminMenuButton);
 
         header.setLeft(leftSection);
@@ -171,7 +164,6 @@ public class MainLayout {
         catalogButton.setVisible(true);
         initializeCartBadge();
 
-        // Rendre le menu Admin Tasks visible si l'utilisateur est un admin
         User currentUser = SessionManager.getCurrentUser();
         if (currentUser != null && currentUser.isAdmin()) {
             adminMenuButton.setVisible(true);
@@ -183,7 +175,7 @@ public class MainLayout {
         profileMenuButton.setVisible(false);
         cartButton.setVisible(false);
         catalogButton.setVisible(false);
-        adminMenuButton.setVisible(false); // Cacher le menu Admin Tasks
+        adminMenuButton.setVisible(false); 
     }
 
     public void setContent(Node content) {
@@ -209,8 +201,8 @@ public class MainLayout {
 
     private void initializeCartBadge() {
         int userId = SessionManager.getCurrentUser().getId();
-        OrderDAO orderDAO = new OrderDAO();
-        OrderItemDAO orderItemDAO = new OrderItemDAO();
+        OrderSQL orderDAO = new OrderSQL();
+        OrderItemSQL orderItemDAO = new OrderItemSQL();
 
         try {
             Order inProgressOrder = orderDAO.getInProgressOrder(userId);

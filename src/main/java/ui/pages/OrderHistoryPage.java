@@ -3,8 +3,6 @@ package ui.pages;
 import java.sql.SQLException;
 import java.util.List;
 
-import dao.InvoiceDAO;
-import dao.OrderDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -12,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import models.Order;
+import sqlbdd.InvoiceSQL;
+import sqlbdd.OrderSQL;
 import tools.SessionManager;
 
 public class OrderHistoryPage {
@@ -30,8 +30,7 @@ public class OrderHistoryPage {
         contentBox.getChildren().add(titleLabel);
 
         try {
-            // Récupérer les commandes de l'utilisateur
-            List<Order> orders = new OrderDAO().getOrdersByUser(SessionManager.getCurrentUser().getId());
+            List<Order> orders = new OrderSQL().getOrdersByUser(SessionManager.getCurrentUser().getId());
             for (Order order : orders) {
                 VBox orderBox = new VBox(10);
                 orderBox.setPadding(new Insets(10));
@@ -43,7 +42,6 @@ public class OrderHistoryPage {
                         " | Status: ");
                 Label statusLabel = new Label(order.getStatus());
                 
-                // Appliquer le style vert gras si le statut est "delivered"
                 if ("delivered".equalsIgnoreCase(order.getStatus())) {
                     statusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
                 } else {
@@ -52,8 +50,7 @@ public class OrderHistoryPage {
 
                 Button viewInvoiceButton = new Button("View Invoice");
                 viewInvoiceButton.setOnAction(e -> {
-                    // Afficher ou télécharger la facture
-                    new InvoiceDAO().downloadInvoice(order.getOrderId());
+                    new InvoiceSQL().downloadInvoice(order.getOrderId());
                 });
 
                 orderBox.getChildren().addAll(orderLabel, statusLabel, viewInvoiceButton);

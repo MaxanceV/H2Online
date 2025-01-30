@@ -1,12 +1,12 @@
 package ui.pages;
 
-import dao.BrandDAO;
-import dao.CategoryDAO;
-import dao.ProductDAO;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import models.Product;
+import sqlbdd.BrandSQL;
+import sqlbdd.CategorySQL;
+import sqlbdd.ProductSQL;
 import ui.elements.CatalogFilter;
 import ui.elements.ProductCard;
 
@@ -21,34 +21,29 @@ public class CatalogPage {
     private BorderPane view;
     private FlowPane productPane;
     private CatalogFilter catalogFilter;
-    private ScrollPane scrollPane; // Ajout du ScrollPane
+    private ScrollPane scrollPane; 
 
     public CatalogPage() {
         view = new BorderPane();
 
-        // Initialisation du panneau des produits
         productPane = new FlowPane();
         productPane.setHgap(10);
         productPane.setVgap(10);
 
-        // Encapsuler le FlowPane dans un ScrollPane
         scrollPane = new ScrollPane(productPane);
-        scrollPane.setFitToWidth(true); // Ajuste la largeur pour correspondre au contenu
-        scrollPane.setFitToHeight(true); // Ajuste la hauteur pour correspondre au contenu
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Activer la barre verticale si nécessaire
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Désactiver la barre horizontale
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true); 
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); 
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); 
 
-        // Créer et configurer le filtre du catalogue
         catalogFilter = new CatalogFilter();
         catalogFilter.getApplyFiltersButton().setOnAction(e -> applyFilters());
         catalogFilter.getSearchButton().setOnAction(e -> applyFilters());
 
-        // Charger les produits initialement
         loadProducts();
 
-        // Ajouter les sections au layout principal
-        view.setCenter(scrollPane); // Utiliser le ScrollPane comme contenu central
-        view.setLeft(catalogFilter.getView()); // Place le filtre à gauche
+        view.setCenter(scrollPane);
+        view.setLeft(catalogFilter.getView()); 
     }
 
     public BorderPane getView() {
@@ -57,9 +52,9 @@ public class CatalogPage {
 
     private void loadProducts() {
         productPane.getChildren().clear();
-        ProductDAO productDAO = new ProductDAO();
-        BrandDAO brandDAO = new BrandDAO();
-        CategoryDAO categoryDAO = new CategoryDAO();
+        ProductSQL productDAO = new ProductSQL();
+        BrandSQL brandDAO = new BrandSQL();
+        CategorySQL categoryDAO = new CategorySQL();
 
         try {
             List<Product> products = productDAO.getAllProducts();
@@ -76,7 +71,6 @@ public class CatalogPage {
                 product.setBrands(brandsByProduct.getOrDefault(product.getProductId(), Collections.emptyList()));
                 product.setCategories(categoriesByProduct.getOrDefault(product.getProductId(), Collections.emptyList()));
 
-                // Créer une carte pour le produit
                 ProductCard card = new ProductCard(product);
                 productPane.getChildren().add(card);
             }
@@ -96,9 +90,9 @@ public class CatalogPage {
 
 
         productPane.getChildren().clear();
-        ProductDAO productDAO = new ProductDAO();
-        BrandDAO brandDAO = new BrandDAO();
-        CategoryDAO categoryDAO = new CategoryDAO();
+        ProductSQL productDAO = new ProductSQL();
+        BrandSQL brandDAO = new BrandSQL();
+        CategorySQL categoryDAO = new CategorySQL();
 
         try {
             List<Product> products = productDAO.getAllProducts();
