@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import models.Order;
@@ -20,6 +21,7 @@ public class OrderHistoryPage {
     public OrderHistoryPage() {
         layout = new BorderPane();
 
+        // VBox qui contient les commandes
         VBox contentBox = new VBox(20);
         contentBox.setPadding(new Insets(20));
         contentBox.setAlignment(Pos.TOP_CENTER);
@@ -34,18 +36,20 @@ public class OrderHistoryPage {
             for (Order order : orders) {
                 VBox orderBox = new VBox(10);
                 orderBox.setPadding(new Insets(10));
-                orderBox.setStyle("-fx-border-color: black; -fx-border-width: 1;");
+                orderBox.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-background-color: #f9f9f9;");
 
                 Label orderLabel = new Label("Order ID: " + order.getOrderId() +
                         " | Date: " + order.getOrderDate() +
                         " | Total: " + order.getTotalPrice() + " €" +
                         " | Status: ");
+                orderLabel.setStyle("-fx-text-fill: black; -fx-font-size: 14px;"); // 🔹 Ajout pour le rendre lisible
+
                 Label statusLabel = new Label(order.getStatus());
                 
                 if ("delivered".equalsIgnoreCase(order.getStatus())) {
                     statusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
                 } else {
-                    statusLabel.setStyle("-fx-text-fill: black;"); // Style par défaut pour les autres statuts
+                    statusLabel.setStyle("-fx-text-fill: black;");
                 }
 
                 Button viewInvoiceButton = new Button("View Invoice");
@@ -60,7 +64,15 @@ public class OrderHistoryPage {
             e.printStackTrace();
         }
 
-        layout.setCenter(contentBox);
+        // Ajout du ScrollPane pour permettre le défilement si trop de commandes
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(contentBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setStyle("-fx-background: transparent;");
+
+        layout.setCenter(scrollPane);
     }
 
     public BorderPane getView() {

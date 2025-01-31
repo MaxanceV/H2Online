@@ -55,7 +55,7 @@ public class CatalogFilter {
 
         // Slider pour plage de prix
         Label priceLabel = new Label("Price range");
-        priceRangeSlider = new RangeSlider(0, 50, 0, 50); // Plage de 0 à 50
+        priceRangeSlider = new RangeSlider(0, 20, 0, 20); // Plage de 0 à 50
         priceRangeSlider.setShowTickLabels(true);
         priceRangeSlider.setShowTickMarks(true);
 

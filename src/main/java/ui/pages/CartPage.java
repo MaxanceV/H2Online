@@ -56,7 +56,7 @@ public class CartPage {
             cartItemsBox.setPadding(new Insets(10));
             cartItemsBox.setAlignment(Pos.TOP_LEFT);
 
-            Label cartTitle = new Label("Current Cart Contents");
+            Label cartTitle = new Label("Current Cart Content");
             cartTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
             cartItemsBox.getChildren().add(cartTitle);
 
