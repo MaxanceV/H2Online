@@ -15,20 +15,27 @@ import sqlbdd.InvoiceSQL;
 import sqlbdd.OrderSQL;
 import tools.SessionManager;
 
+/**
+ * Displays the order history for the currently logged-in user,
+ * allowing them to view the status of past orders and download invoices.
+ */
 public class OrderHistoryPage {
     private BorderPane layout;
 
+    /**
+     * Constructs the {@code OrderHistoryPage} by fetching the user's orders and
+     * displaying them in a scrollable layout.
+     */
     public OrderHistoryPage() {
         layout = new BorderPane();
 
-        // VBox qui contient les commandes
+        // VBox that contains the list of orders
         VBox contentBox = new VBox(20);
         contentBox.setPadding(new Insets(20));
         contentBox.setAlignment(Pos.TOP_CENTER);
 
         Label titleLabel = new Label("Order History");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
         contentBox.getChildren().add(titleLabel);
 
         try {
@@ -42,10 +49,9 @@ public class OrderHistoryPage {
                         " | Date: " + order.getOrderDate() +
                         " | Total: " + order.getTotalPrice() + " €" +
                         " | Status: ");
-                orderLabel.setStyle("-fx-text-fill: black; -fx-font-size: 14px;"); // 🔹 Ajout pour le rendre lisible
+                orderLabel.setStyle("-fx-text-fill: black; -fx-font-size: 14px;");
 
                 Label statusLabel = new Label(order.getStatus());
-                
                 if ("delivered".equalsIgnoreCase(order.getStatus())) {
                     statusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
                 } else {
@@ -64,7 +70,7 @@ public class OrderHistoryPage {
             e.printStackTrace();
         }
 
-        // Ajout du ScrollPane pour permettre le défilement si trop de commandes
+        // A scroll pane to allow scrolling if there are many orders
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(contentBox);
         scrollPane.setFitToWidth(true);
@@ -75,6 +81,11 @@ public class OrderHistoryPage {
         layout.setCenter(scrollPane);
     }
 
+    /**
+     * Retrieves the main layout of the order history page.
+     *
+     * @return A {@link BorderPane} containing the order history.
+     */
     public BorderPane getView() {
         return layout;
     }

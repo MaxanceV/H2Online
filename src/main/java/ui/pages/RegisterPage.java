@@ -1,7 +1,6 @@
 package ui.pages;
 
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -10,35 +9,57 @@ import sqlbdd.UserSQL;
 import tools.PasswordManager;
 import ui.elements.MainLayout;
 
+/**
+ * Represents a registration page where new users can fill in their personal details
+ * and create an account. Includes password confirmation and validation checks.
+ */
 public class RegisterPage {
     private MainLayout mainLayout;
 
+    /**
+     * Constructs a {@code RegisterPage} with the specified {@link MainLayout}.
+     *
+     * @param mainLayout The main layout of the application to switch views.
+     */
     public RegisterPage(MainLayout mainLayout) {
         this.mainLayout = mainLayout;
     }
 
+    /**
+     * Creates and returns a {@link VBox} containing the registration form fields
+     * (first name, last name, email, password, and confirmation) and buttons
+     * (register, cancel). Performs input validation on the form data.
+     *
+     * @return A {@link VBox} layout containing all UI elements for registration.
+     */
     public VBox getView() {
         Label title = new Label("Registration");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         TextField firstNameField = new TextField();
         firstNameField.setPromptText("First Name");
+
         TextField lastNameField = new TextField();
         lastNameField.setPromptText("Name");
+
         TextField emailField = new TextField();
         emailField.setPromptText("Email");
+
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
+
         PasswordField confirmPasswordField = new PasswordField();
         confirmPasswordField.setPromptText("Confirm password");
 
         Button registerButton = new Button("Register");
         registerButton.setDisable(true);
+
         Button cancelButton = new Button("Cancel");
 
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
 
+        // Runnable to validate fields and enable/disable the register button
         Runnable validateFields = () -> {
             boolean allFieldsFilled = !firstNameField.getText().isEmpty() &&
                                       !lastNameField.getText().isEmpty() &&
@@ -50,7 +71,7 @@ public class RegisterPage {
 
             if (allFieldsFilled && passwordsMatch) {
                 registerButton.setDisable(false);
-                errorLabel.setText(""); 
+                errorLabel.setText("");
             } else {
                 registerButton.setDisable(true);
                 if (!passwordsMatch) {
@@ -59,45 +80,47 @@ public class RegisterPage {
             }
         };
 
+        // Listeners to trigger field validation on each text change
         firstNameField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
         lastNameField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
         emailField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
         confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
 
+        // Register button action
         registerButton.setOnAction(e -> {
             UserSQL userDAO = new UserSQL();
             try {
                 if (!userDAO.emailExists(emailField.getText())) {
-
                     User newUser = new User(
-                        0, 
+                        0,
                         firstNameField.getText(),
                         lastNameField.getText(),
                         emailField.getText(),
                         PasswordManager.hashPassword(passwordField.getText()),
-                        "customer" 
+                        "customer"
                     );
-                    System.out.println("Password after ashing register in java : " + PasswordManager.hashPassword(passwordField.getText()));
+
+                    System.out.println("Password after hashing register in java: " + PasswordManager.hashPassword(passwordField.getText()));
 
                     userDAO.addUser(newUser);
-                    System.out.println("User register sucessfully !");
+                    System.out.println("User registered successfully!");
                     mainLayout.setContent(new LoginPage(mainLayout).getView()); 
                 } else {
                     errorLabel.setText("Email already used");
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-                errorLabel.setText("Error during the registration, please do it again.");
+                errorLabel.setText("Error during the registration, please try again.");
             }
         });
 
-
+        // Cancel button action
         cancelButton.setOnAction(e -> {
             mainLayout.setContent(new LoginPage(mainLayout).getView());
         });
 
-        // Disposition des éléments
+        // Layout for the form fields
         GridPane form = new GridPane();
         form.setAlignment(Pos.CENTER);
         form.setHgap(10);

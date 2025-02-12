@@ -15,13 +15,28 @@ import tools.NotificationUtils;
 import tools.PasswordManager;
 import tools.SessionManager;
 
+/**
+ * Displays a user settings page allowing the current user to update their personal
+ * details (name, email, phone, address, etc.) and change their password.
+ */
 public class UserSettingsPage {
     private User user;
 
+    /**
+     * Constructs a {@code UserSettingsPage} for the current logged-in user.
+     */
     public UserSettingsPage() {
         this.user = SessionManager.getCurrentUser();
     }
 
+    /**
+     * Creates and returns a {@link VBox} containing input fields for user details,
+     * a button to save changes, and a button to change the password. Fields are
+     * validated to enable the save button only when required fields are filled
+     * and changes are detected.
+     *
+     * @return A {@link VBox} layout that represents the user settings page.
+     */
     public VBox getView() {
         TextField firstNameField = new TextField(safeString(user.getFirstName()));
         TextField lastNameField = new TextField(safeString(user.getLastName()));
@@ -66,22 +81,23 @@ public class UserSettingsPage {
         Runnable checkFields = () -> {
             boolean requiredFieldsFilled =
                     !firstNameField.getText().isEmpty() &&
-                            !lastNameField.getText().isEmpty() &&
-                            !emailField.getText().isEmpty();
+                    !lastNameField.getText().isEmpty() &&
+                    !emailField.getText().isEmpty();
 
             boolean hasChanges =
                     !safeString(firstNameField.getText()).equals(safeString(user.getFirstName())) ||
-                            !safeString(lastNameField.getText()).equals(safeString(user.getLastName())) ||
-                            !safeString(emailField.getText()).equals(safeString(user.getEmail())) ||
-                            !safeString(phoneField.getText()).equals(safeString(user.getPhoneNumber())) ||
-                            !safeString(addressField.getText()).equals(safeString(user.getAddress())) ||
-                            !safeString(cityField.getText()).equals(safeString(user.getCity())) ||
-                            !safeString(postalCodeField.getText()).equals(safeString(user.getPostalCode())) ||
-                            !safeString(countryField.getText()).equals(safeString(user.getCountry()));
+                    !safeString(lastNameField.getText()).equals(safeString(user.getLastName())) ||
+                    !safeString(emailField.getText()).equals(safeString(user.getEmail())) ||
+                    !safeString(phoneField.getText()).equals(safeString(user.getPhoneNumber())) ||
+                    !safeString(addressField.getText()).equals(safeString(user.getAddress())) ||
+                    !safeString(cityField.getText()).equals(safeString(user.getCity())) ||
+                    !safeString(postalCodeField.getText()).equals(safeString(user.getPostalCode())) ||
+                    !safeString(countryField.getText()).equals(safeString(user.getCountry()));
 
             saveButton.setDisable(!(requiredFieldsFilled && hasChanges));
         };
 
+        // Listeners to detect field changes
         firstNameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
         lastNameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
         emailField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
@@ -91,6 +107,7 @@ public class UserSettingsPage {
         postalCodeField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
         countryField.textProperty().addListener((observable, oldValue, newValue) -> checkFields.run());
 
+        // Save button action
         saveButton.setOnAction(e -> {
             try {
                 UserSQL userDAO = new UserSQL();
@@ -121,16 +138,22 @@ public class UserSettingsPage {
             }
         });
 
+        // Change password button action
         changePasswordButton.setOnAction(e -> openPasswordChangePopup());
 
         return layout;
     }
 
+    /**
+     * Opens a popup window to change the user's password. Validates the current password,
+     * checks that new passwords match, and updates the user's password in the database
+     * upon confirmation.
+     */
     private void openPasswordChangePopup() {
         Stage popupStage = new Stage();
         popupStage.setTitle("Change Password");
         popupStage.setResizable(false);
-        popupStage.initModality(Modality.APPLICATION_MODAL); // Blocks other windows until closed
+        popupStage.initModality(Modality.APPLICATION_MODAL);
 
         PasswordField oldPasswordField = new PasswordField();
         oldPasswordField.setPromptText("Current password");
@@ -166,6 +189,7 @@ public class UserSettingsPage {
         Scene popupScene = new Scene(content);
         popupStage.setScene(popupScene);
 
+        // Validate the password fields
         Runnable validateFields = () -> {
             String oldPassword = oldPasswordField.getText();
             String newPassword = newPasswordField.getText();
@@ -184,6 +208,7 @@ public class UserSettingsPage {
         newPasswordField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
         confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> validateFields.run());
 
+        // Confirm button action
         confirmButton.setOnAction(e -> {
             try {
                 UserSQL userDAO = new UserSQL();
@@ -193,28 +218,37 @@ public class UserSettingsPage {
                 if (PasswordManager.hashPassword(oldPassword).equals(user.getPassword())) {
                     user.setPassword(PasswordManager.hashPassword(newPassword));
                     userDAO.updateUser(user);
-                    NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
-                            "Password changed successfully!", true);
-
-                    popupStage.close(); 
+                    NotificationUtils.showNotification(
+                            SessionManager.getMainLayout().getRootPane(),
+                            "Password changed successfully!",
+                            true
+                    );
+                    popupStage.close();
                 } else {
                     errorLabel.setText("Incorrect current password.");
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
-                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
-                        "An error occurred while changing the password.", false);
+                NotificationUtils.showNotification(
+                        SessionManager.getMainLayout().getRootPane(),
+                        "An error occurred while changing the password.",
+                        false
+                );
             }
         });
 
-        cancelButton.setOnAction(e -> {
-            popupStage.close();
-        });
+        // Cancel button action
+        cancelButton.setOnAction(e -> popupStage.close());
 
         popupStage.showAndWait();
     }
 
-
+    /**
+     * Safely handles {@code null} strings by converting them to empty strings.
+     *
+     * @param value The string to check.
+     * @return The original string if not null; otherwise an empty string.
+     */
     private String safeString(String value) {
         return value == null ? "" : value;
     }

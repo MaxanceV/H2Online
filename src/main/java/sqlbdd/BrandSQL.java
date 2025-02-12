@@ -14,9 +14,17 @@ import java.util.stream.Collectors;
 import models.Brand;
 import tools.DBconnection;
 
+/**
+ * Provides database operations for managing brands.
+ */
 public class BrandSQL {
 
-    // Ajouter une marque
+    /**
+     * Adds a new brand to the database.
+     *
+     * @param brand The brand to add.
+     * @throws SQLException If a database error occurs.
+     */
     public void addBrand(Brand brand) throws SQLException {
         String query = "INSERT INTO brands (name, description) VALUES (?, ?)";
         try (Connection connection = DBconnection.getConnection();
@@ -27,7 +35,12 @@ public class BrandSQL {
         }
     }
 
-    // Récupérer toutes les marques
+    /**
+     * Retrieves all brands from the database.
+     *
+     * @return A list of all brands.
+     * @throws SQLException If a database error occurs.
+     */
     public List<Brand> getAllBrands() throws SQLException {
         List<Brand> brands = new ArrayList<>();
         String query = "SELECT * FROM brands";
@@ -41,7 +54,13 @@ public class BrandSQL {
         return brands;
     }
 
-    // Associer une marque à un produit
+    /**
+     * Associates a brand with a product.
+     *
+     * @param productId The product ID.
+     * @param brandId The brand ID.
+     * @throws SQLException If a database error occurs.
+     */
     public void addProductBrand(int productId, int brandId) throws SQLException {
         String query = "INSERT INTO productsbrands (product_id, brand_id) VALUES (?, ?)";
         try (Connection connection = DBconnection.getConnection();
@@ -52,7 +71,13 @@ public class BrandSQL {
         }
     }
 
-    // Mapper une marque depuis le ResultSet
+    /**
+     * Maps a result set row to a Brand object.
+     *
+     * @param rs The result set.
+     * @return A Brand object.
+     * @throws SQLException If a database error occurs.
+     */
     private Brand mapBrand(ResultSet rs) throws SQLException {
         Brand brand = new Brand();
         brand.setBrandId(rs.getInt("brand_id"));
@@ -61,7 +86,12 @@ public class BrandSQL {
         return brand;
     }
 
-    // Supprimer une marque
+    /**
+     * Deletes a brand from the database.
+     *
+     * @param brandId The ID of the brand to delete.
+     * @throws SQLException If a database error occurs.
+     */
     public void deleteBrand(int brandId) throws SQLException {
         String query = "DELETE FROM brands WHERE brand_id = ?";
         try (Connection connection = DBconnection.getConnection();
@@ -71,7 +101,12 @@ public class BrandSQL {
         }
     }
 
-    // Récupérer tous les noms de marques
+    /**
+     * Retrieves all brand names from the database.
+     *
+     * @return A list of brand names.
+     * @throws SQLException If a database error occurs.
+     */
     public List<String> getAllBrandNames() throws SQLException {
         List<String> brandNames = new ArrayList<>();
         String query = "SELECT name FROM brands";
@@ -85,7 +120,12 @@ public class BrandSQL {
         return brandNames;
     }
 
-    // Récupérer les marques associées à un produit
+    /**
+     * Retrieves the brands associated with a given product ID.
+     *
+     * @param productId The product ID.
+     * @return A list of brand names associated with the product.
+     */
     public List<String> getBrandsByProductId(int productId) {
         List<String> brands = new ArrayList<>();
         String query = "SELECT b.name FROM brands b " +
@@ -104,8 +144,12 @@ public class BrandSQL {
         return brands;
     }
 
-
-    // Récupérer les marques pour plusieurs produits
+    /**
+     * Retrieves brands associated with multiple products.
+     *
+     * @param productIds A list of product IDs.
+     * @return A map where the key is a product ID and the value is a list of associated brand names.
+     */
     public Map<Integer, List<String>> getBrandsForProducts(List<Integer> productIds) {
         Map<Integer, List<String>> productBrands = new HashMap<>();
         String query = "SELECT pb.product_id, b.name " +
@@ -129,5 +173,4 @@ public class BrandSQL {
         }
         return productBrands;
     }
-
 }

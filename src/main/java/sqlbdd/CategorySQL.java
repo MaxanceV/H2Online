@@ -1,3 +1,8 @@
+/**
+ * Data Access Object for managing Category entities in the database.
+ * This class handles all database operations related to categories including
+ * CRUD operations and relationship management with products.
+ */
 package sqlbdd;
 
 import java.sql.Connection;
@@ -16,7 +21,12 @@ import tools.DBconnection;
 
 public class CategorySQL {
 
-    // Ajouter une catégorie
+    /**
+     * Adds a new category to the database.
+     *
+     * @param category The Category object to be added
+     * @throws SQLException If a database access error occurs
+     */
     public void addCategory(Category category) throws SQLException {
         String query = "INSERT INTO categories (name, description) VALUES (?, ?)";
         try (Connection connection = DBconnection.getConnection();
@@ -27,7 +37,12 @@ public class CategorySQL {
         }
     }
 
-    // Récupérer toutes les catégories
+    /**
+     * Retrieves all categories from the database.
+     *
+     * @return List of all Category objects
+     * @throws SQLException If a database access error occurs
+     */
     public List<Category> getAllCategories() throws SQLException {
         List<Category> categories = new ArrayList<>();
         String query = "SELECT * FROM categories";
@@ -41,7 +56,13 @@ public class CategorySQL {
         return categories;
     }
 
-    // Associer une catégorie à un produit
+    /**
+     * Associates a category with a product in the database.
+     *
+     * @param productId The ID of the product
+     * @param categoryId The ID of the category
+     * @throws SQLException If a database access error occurs
+     */
     public void addProductCategory(int productId, int categoryId) throws SQLException {
         String query = "INSERT INTO productscategories (product_id, category_id) VALUES (?, ?)";
         try (Connection connection = DBconnection.getConnection();
@@ -52,7 +73,13 @@ public class CategorySQL {
         }
     }
 
-    // Mapper une catégorie depuis le ResultSet
+    /**
+     * Maps a database result set row to a Category object.
+     *
+     * @param rs The ResultSet containing category data
+     * @return A new Category object populated with the data
+     * @throws SQLException If a database access error occurs
+     */
     private Category mapCategory(ResultSet rs) throws SQLException {
         Category category = new Category();
         category.setCategoryId(rs.getInt("category_id"));
@@ -61,7 +88,12 @@ public class CategorySQL {
         return category;
     }
 
-    // Supprimer une catégorie
+    /**
+     * Deletes a category from the database.
+     *
+     * @param categoryId The ID of the category to delete
+     * @throws SQLException If a database access error occurs
+     */
     public void deleteCategory(int categoryId) throws SQLException {
         String query = "DELETE FROM categories WHERE category_id = ?";
         try (Connection connection = DBconnection.getConnection();
@@ -71,7 +103,12 @@ public class CategorySQL {
         }
     }
 
-    // Récupérer tous les noms de catégories
+    /**
+     * Retrieves all category names from the database.
+     *
+     * @return List of category names
+     * @throws SQLException If a database access error occurs
+     */
     public List<String> getAllCategoryNames() throws SQLException {
         List<String> categoryNames = new ArrayList<>();
         String query = "SELECT name FROM categories";
@@ -85,7 +122,12 @@ public class CategorySQL {
         return categoryNames;
     }
 
-    // Récupérer les catégories associées à un produit
+    /**
+     * Retrieves all categories associated with a specific product.
+     *
+     * @param productId The ID of the product
+     * @return List of category names associated with the product
+     */
     public List<String> getCategoriesByProductId(int productId) {
         List<String> categories = new ArrayList<>();
         String query = "SELECT c.name FROM categories c " +
@@ -104,8 +146,13 @@ public class CategorySQL {
         return categories;
     }
 
-
-    // Récupérer les catégories pour plusieurs produits
+    /**
+     * Retrieves categories for multiple products in a single database query.
+     * Returns a map where the key is the product ID and the value is a list of category names.
+     *
+     * @param productIds List of product IDs to fetch categories for
+     * @return Map of product IDs to their associated category names
+     */
     public Map<Integer, List<String>> getCategoriesForProducts(List<Integer> productIds) {
         Map<Integer, List<String>> productCategories = new HashMap<>();
         String query = "SELECT pc.product_id, c.name " +
@@ -129,5 +176,4 @@ public class CategorySQL {
         }
         return productCategories;
     }
-
 }

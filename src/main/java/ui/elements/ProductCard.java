@@ -16,11 +16,23 @@ import tools.CartUtils;
 import tools.SessionManager;
 import ui.pages.ProductDetailPage;
 
+/**
+ * Represents a visual card component displaying product details such as an image,
+ * name, volume, price, and stock availability. Includes functionality to view
+ * the product's detailed page and add it to the cart.
+ */
 public class ProductCard extends VBox {
 
     private static final String DEFAULT_IMAGE_PATH = "/images/products/defaut.png";
     private static final String CART_IMAGE_PATH = "/images/logo/pannier.png";
 
+    /**
+     * Constructs a {@code ProductCard} for the given {@link Product}. Displays
+     * the product image, name, volume, price, and provides a button to add
+     * the product to the cart if it is in stock.
+     *
+     * @param product The product to be displayed on this card.
+     */
     public ProductCard(Product product) {
         this.setAlignment(Pos.CENTER);
         this.setSpacing(10);
@@ -44,8 +56,8 @@ public class ProductCard extends VBox {
             }
         });
 
-        String productName = product.getName().length() > 17 
-                ? product.getName().substring(0, 17) + "..." 
+        String productName = product.getName().length() > 17
+                ? product.getName().substring(0, 17) + "..."
                 : product.getName();
         Text name = new Text(productName);
         name.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-fill: black;");
@@ -66,7 +78,7 @@ public class ProductCard extends VBox {
         if (product.getStockQuantity() > 0) {
             Button addToCartButton = new Button();
             ImageView cartImageView = new ImageView(loadCartImage());
-            cartImageView.setFitWidth(20); // Taille du logo
+            cartImageView.setFitWidth(20);
             cartImageView.setFitHeight(20);
             cartImageView.setPreserveRatio(true);
             addToCartButton.setGraphic(cartImageView);
@@ -86,6 +98,13 @@ public class ProductCard extends VBox {
         }
     }
 
+    /**
+     * Attempts to load the product image from the given image name. If the image
+     * file is not found, a default image is used.
+     *
+     * @param imageName The name of the product image file.
+     * @return An {@link Image} object representing the product image.
+     */
     private Image loadProductImage(String imageName) {
         String imagePath = "/images/products/" + imageName;
         try {
@@ -99,6 +118,12 @@ public class ProductCard extends VBox {
         return new Image(getClass().getResourceAsStream(DEFAULT_IMAGE_PATH));
     }
 
+    /**
+     * Loads the cart icon image. If the image is not found, logs a message and
+     * returns null.
+     *
+     * @return An {@link Image} object for the cart icon, or null if not found.
+     */
     private Image loadCartImage() {
         try {
             return new Image(getClass().getResourceAsStream(CART_IMAGE_PATH));

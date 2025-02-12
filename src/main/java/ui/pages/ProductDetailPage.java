@@ -21,15 +21,28 @@ import ui.elements.ProductCard;
 
 import java.util.List;
 
+/**
+ * Displays detailed information about a specific {@link Product}, including its
+ * name, description, brands, categories, stock availability, and a list of
+ * recommended products. Offers functionality to add items to the cart and view
+ * the cart.
+ */
 public class ProductDetailPage {
     private BorderPane layout;
     private Scene scene;
 
+    /**
+     * Constructs a {@code ProductDetailPage} for the given product. The page
+     * includes product images, descriptions, brand and category details,
+     * stock availability, quantity selection, and recommended products.
+     *
+     * @param product The product to display details for.
+     */
     public ProductDetailPage(Product product) {
         layout = new BorderPane();
 
-        VBox mainContent = new VBox(20); 
-        mainContent.setPadding(new Insets(20)); 
+        VBox mainContent = new VBox(20);
+        mainContent.setPadding(new Insets(20));
         mainContent.setAlignment(Pos.TOP_LEFT);
 
         VBox leftCenterSection = new VBox(10);
@@ -45,7 +58,9 @@ public class ProductDetailPage {
         Label description = new Label(product.getDescription());
         description.setWrapText(true);
 
+        // Refresh brand and category details from the database
         product.reloadDetails();
+
         Label brandsLabel = new Label("Brand(s): " + String.join(", ", product.getBrands()));
         Label categoriesLabel = new Label("Category(s): " + String.join(", ", product.getCategories()));
 
@@ -61,7 +76,7 @@ public class ProductDetailPage {
                     new SpinnerValueFactory.IntegerSpinnerValueFactory(1, product.getStockQuantity(), 1);
             quantitySpinner.setValueFactory(valueFactory);
 
-            javafx.scene.control.Button addToCartButton = new javafx.scene.control.Button("Add to cart");
+            Button addToCartButton = new Button("Add to cart");
             addToCartButton.setOnAction(e -> {
                 CartUtils.addToCart(SessionManager.getCurrentUser().getId(), product, quantitySpinner.getValue());
             });
@@ -72,26 +87,26 @@ public class ProductDetailPage {
             outOfStockLabel.setStyle("-fx-text-fill: red; -fx-font-size: 16px; -fx-font-weight: bold;");
             rightSection.getChildren().add(outOfStockLabel);
         }
-        
+
+        // Button to view cart
         Button viewCartButton = new Button("View Cart");
         viewCartButton.setOnAction(e -> {
             SessionManager.getMainLayout().setContent(new CartPage().getView());
         });
-
         rightSection.getChildren().add(viewCartButton);
-
 
         HBox contentSections = new HBox(20);
         contentSections.getChildren().addAll(leftCenterSection, rightSection);
         mainContent.getChildren().add(contentSections);
 
+        // Recommendations section
         VBox recommendationsBox = new VBox(10);
         recommendationsBox.setAlignment(Pos.TOP_LEFT);
 
         Label recommendationsTitle = new Label("You might also like");
         recommendationsTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        List<Product> recommendations = getRecommendations(product); 
+        List<Product> recommendations = getRecommendations(product);
         HBox recommendedProducts = new HBox(10);
         recommendedProducts.setAlignment(Pos.CENTER_LEFT);
 
@@ -109,11 +124,16 @@ public class ProductDetailPage {
 
         layout.setCenter(scrollPane);
 
-        
-
         scene = new Scene(layout, 800, 600);
     }
 
+    /**
+     * Retrieves recommendations for a given product by querying the database for
+     * similar brands or categories.
+     *
+     * @param product The product for which recommendations are sought.
+     * @return A list of recommended products.
+     */
     private List<Product> getRecommendations(Product product) {
         ProductSQL productDAO = new ProductSQL();
         try {
@@ -121,10 +141,15 @@ public class ProductDetailPage {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return List.of(); 
+        return List.of();
     }
 
-
+    /**
+     * Retrieves the {@link BorderPane} layout of this page, containing all
+     * product details and recommendations.
+     *
+     * @return The main layout for the product detail page.
+     */
     public BorderPane getView() {
         return layout;
     }

@@ -7,9 +7,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides database operations for managing products.
+ */
 public class ProductSQL {
 
-    // Ajouter un produit
+    /**
+     * Adds a new product to the database.
+     *
+     * @param product The product to add.
+     * @throws SQLException If a database access error occurs.
+     */
     public void addProduct(Product product) throws SQLException {
         String query = "INSERT INTO products (name, volume_per_bottle, description, image, price, stock_quantity) " +
                        "VALUES (?, ?, ?, ?, ?, ?)";
@@ -25,7 +33,13 @@ public class ProductSQL {
         }
     }
 
-    // Récupérer un produit par son ID
+    /**
+     * Retrieves a product from the database by its ID.
+     *
+     * @param productId The ID of the product to retrieve.
+     * @return The product if found, otherwise null.
+     * @throws SQLException If a database access error occurs.
+     */
     public Product getProductById(int productId) throws SQLException {
         String query = "SELECT * FROM products WHERE product_id = ?";
         try (Connection connection = DBconnection.getConnection();
@@ -37,10 +51,15 @@ public class ProductSQL {
                 }
             }
         }
-        return null; // Retourne null si le produit n'existe pas
+        return null; // Returns null if the product does not exist
     }
 
-    // Récupérer tous les produits
+    /**
+     * Retrieves all products from the database.
+     *
+     * @return A list containing all products.
+     * @throws SQLException If a database access error occurs.
+     */
     public List<Product> getAllProducts() throws SQLException {
         List<Product> products = new ArrayList<>();
         String query = "SELECT * FROM products";
@@ -54,7 +73,12 @@ public class ProductSQL {
         return products;
     }
 
-    // Mettre à jour un produit
+    /**
+     * Updates an existing product in the database.
+     *
+     * @param product The product with updated information.
+     * @throws SQLException If a database access error occurs.
+     */
     public void updateProduct(Product product) throws SQLException {
         String query = "UPDATE products SET name = ?, volume_per_bottle = ?, description = ?, image = ?, price = ?, stock_quantity = ? WHERE product_id = ?";
         try (Connection connection = DBconnection.getConnection();
@@ -70,7 +94,12 @@ public class ProductSQL {
         }
     }
 
-    // Supprimer un produit
+    /**
+     * Deletes a product from the database by its ID.
+     *
+     * @param productId The ID of the product to delete.
+     * @throws SQLException If a database access error occurs.
+     */
     public void deleteProduct(int productId) throws SQLException {
         String query = "DELETE FROM products WHERE product_id = ?";
         try (Connection connection = DBconnection.getConnection();
@@ -80,7 +109,13 @@ public class ProductSQL {
         }
     }
 
-    // Mapper les résultats d'une requête à un objet Product
+    /**
+     * Maps a {@link ResultSet} row to a {@link Product} object.
+     *
+     * @param rs The result set containing product information.
+     * @return A populated Product object.
+     * @throws SQLException If a database access error occurs.
+     */
     private Product mapProduct(ResultSet rs) throws SQLException {
         Product product = new Product();
         product.setProductId(rs.getInt("product_id"));
@@ -95,7 +130,13 @@ public class ProductSQL {
         return product;
     }
 
-    // Récupérer les produits par une liste d'IDs
+    /**
+     * Retrieves a list of products by their IDs.
+     *
+     * @param productIds A list of product IDs to retrieve.
+     * @return A list containing matching products; returns an empty list if no IDs are provided.
+     * @throws SQLException If a database access error occurs.
+     */
     public List<Product> getProductsByIds(List<Integer> productIds) throws SQLException {
         List<Product> products = new ArrayList<>();
         if (productIds.isEmpty()) return products;
@@ -115,7 +156,13 @@ public class ProductSQL {
         }
         return products;
     }
-    
+
+    /**
+     * Retrieves a list of recommended products based on similar brands or categories.
+     *
+     * @param product The product for which recommendations are sought.
+     * @return A list of recommended products (up to 15), excluding the given product.
+     */
     public List<Product> getRecommendations(Product product) {
         List<Product> recommendations = new ArrayList<>();
         String query = "SELECT DISTINCT p.* " +
@@ -140,9 +187,9 @@ public class ProductSQL {
 
         try (Connection connection = DBconnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, product.getProductId()); // Exclure le produit actuel
-            stmt.setInt(2, product.getProductId()); // Filtrer par marques similaires
-            stmt.setInt(3, product.getProductId()); // Filtrer par catégories similaires
+            stmt.setInt(1, product.getProductId()); // Exclude the current product
+            stmt.setInt(2, product.getProductId()); // Filter by similar brands
+            stmt.setInt(3, product.getProductId()); // Filter by similar categories
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -155,6 +202,5 @@ public class ProductSQL {
 
         return recommendations;
     }
-
 
 }

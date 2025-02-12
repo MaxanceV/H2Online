@@ -1,17 +1,32 @@
+/**
+ * Data Access Object for managing orders in the database.
+ * This class handles all database operations related to orders including creation,
+ * retrieval, status updates, and total price calculations.
+ */
 package sqlbdd;
 
-import models.Order;
-import models.OrderItem;
-import tools.DBconnection;
-
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.Order;
+import tools.DBconnection;
+
 public class OrderSQL {
 
-    // Méthode pour créer une nouvelle commande "in progress"
+    /**
+     * Creates a new order with 'in progress' status for a specific user.
+     * Initializes the order with a total price of 0.00.
+     *
+     * @param userId The ID of the user creating the order
+     * @return The ID of the newly created order
+     * @throws SQLException If a database access error occurs
+     */
     public int createNewOrder(int userId) throws SQLException {
         String query = "INSERT INTO orders (user_id, status, total_price) VALUES (?, 'in progress', 0.00)";
         try (Connection connection = DBconnection.getConnection();
@@ -28,7 +43,14 @@ public class OrderSQL {
         }
     }
 
-    // Méthode pour récupérer une commande "in progress" d'un utilisateur
+    /**
+     * Retrieves the current 'in progress' order for a specific user.
+     * Includes all associated order items.
+     *
+     * @param userId The ID of the user
+     * @return The Order object if found, null otherwise
+     * @throws SQLException If a database access error occurs
+     */
     public Order getInProgressOrder(int userId) throws SQLException {
         String query = "SELECT * FROM orders WHERE user_id = ? AND status = 'in progress'";
         try (Connection connection = DBconnection.getConnection();
@@ -45,17 +67,22 @@ public class OrderSQL {
                 order.setTotalPrice(resultSet.getBigDecimal("total_price"));
                 order.setPaymentMethod(resultSet.getString("payment_method"));
 
-                // Charger les articles associés
                 OrderItemSQL orderItemDAO = new OrderItemSQL();
                 order.setOrderItems(orderItemDAO.getOrderItems(order.getOrderId()));
 
                 return order;
             }
         }
-        return null; // Aucune commande "in progress" trouvée
+        return null;
     }
 
-    // Met à jour le total_price d'une commande
+    /**
+     * Updates the total price of an order.
+     *
+     * @param orderId The ID of the order to update
+     * @param totalPrice The new total price
+     * @throws SQLException If a database access error occurs
+     */
     public void updateOrderTotal(int orderId, BigDecimal totalPrice) throws SQLException {
         String query = "UPDATE orders SET total_price = ? WHERE order_id = ?";
         try (Connection connection = DBconnection.getConnection();
@@ -66,7 +93,13 @@ public class OrderSQL {
         }
     }
 
-    // Change le statut de la commande
+    /**
+     * Updates the status of an order.
+     *
+     * @param orderId The ID of the order to update
+     * @param status The new status
+     * @throws SQLException If a database access error occurs
+     */
     public void updateOrderStatus(int orderId, String status) throws SQLException {
         String query = "UPDATE orders SET status = ? WHERE order_id = ?";
         try (Connection connection = DBconnection.getConnection();
@@ -77,6 +110,13 @@ public class OrderSQL {
         }
     }
     
+    /**
+     * Retrieves an order by its ID.
+     *
+     * @param orderId The ID of the order to retrieve
+     * @return The Order object if found, null otherwise
+     * @throws SQLException If a database access error occurs
+     */
     public Order getOrderById(int orderId) throws SQLException {
         String query = "SELECT * FROM orders WHERE order_id = ?";
         try (Connection connection = DBconnection.getConnection();
@@ -95,9 +135,16 @@ public class OrderSQL {
                 }
             }
         }
-        return null; // Si aucune commande trouvée
+        return null;
     }
     
+    /**
+     * Retrieves all orders for a specific user, ordered by date descending.
+     *
+     * @param userId The ID of the user
+     * @return List of orders associated with the user
+     * @throws SQLException If a database access error occurs
+     */
     public List<Order> getOrdersByUser(int userId) throws SQLException {
         String query = "SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC";
         List<Order> orders = new ArrayList<>();
@@ -120,6 +167,12 @@ public class OrderSQL {
         return orders;
     }
 
+    /**
+     * Retrieves all orders from the database.
+     *
+     * @return List of all orders in the system
+     * @throws SQLException If a database access error occurs
+     */
     public List<Order> getAllOrders() throws SQLException {
         String query = "SELECT * FROM orders";
         List<Order> orders = new ArrayList<>();
@@ -143,5 +196,4 @@ public class OrderSQL {
 
         return orders;
     }
-
 }

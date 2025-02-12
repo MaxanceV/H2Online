@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : mysql:3306
--- Généré le : mer. 08 jan. 2025 à 12:16
+-- Généré le : sam. 08 fév. 2025 à 12:28
 -- Version du serveur : 8.0.40
 -- Version de PHP : 8.2.8
 
@@ -97,7 +97,12 @@ INSERT INTO `invoices` (`invoice_id`, `order_id`, `invoice_date`, `total_amount`
 (4, 5, '2024-12-24 18:04:39', 1.80, 'paid'),
 (5, 6, '2024-12-24 18:30:56', 34.00, 'paid'),
 (6, 7, '2024-12-25 20:04:27', 19.30, 'paid'),
-(7, 8, '2024-12-25 23:54:11', 10.70, 'paid');
+(7, 8, '2024-12-25 23:54:11', 10.70, 'paid'),
+(8, 9, '2025-01-30 15:32:16', 8.80, 'paid'),
+(9, 10, '2025-01-30 15:40:25', 15.60, 'paid'),
+(10, 11, '2025-01-30 16:09:41', 9.70, 'paid'),
+(11, 12, '2025-01-30 16:19:59', 13.30, 'paid'),
+(12, 13, '2025-01-31 08:18:05', 17.80, 'paid');
 
 -- --------------------------------------------------------
 
@@ -131,7 +136,17 @@ INSERT INTO `orderitems` (`order_item_id`, `order_id`, `product_id`, `quantity`,
 (18, 7, 2, 6, 1.80, 10.80),
 (19, 7, 4, 1, 8.50, 8.50),
 (20, 8, 2, 4, 1.80, 7.20),
-(21, 8, 7, 1, 3.50, 3.50);
+(21, 8, 7, 1, 3.50, 3.50),
+(22, 9, 1, 5, 1.40, 7.00),
+(23, 9, 2, 1, 1.80, 1.80),
+(24, 10, 17, 12, 1.30, 15.60),
+(25, 11, 4, 1, 8.50, 8.50),
+(26, 11, 3, 1, 1.20, 1.20),
+(27, 12, 10, 1, 2.50, 2.50),
+(29, 12, 8, 6, 1.80, 10.80),
+(30, 13, 6, 1, 2.00, 2.00),
+(31, 13, 7, 4, 3.50, 14.00),
+(32, 13, 8, 1, 1.80, 1.80);
 
 -- --------------------------------------------------------
 
@@ -157,7 +172,13 @@ INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `status`, `total_pric
 (5, 5, '2024-12-24 17:44:55', 'delivered', 1.80, NULL),
 (6, 5, '2024-12-24 18:30:49', 'validated', 34.00, NULL),
 (7, 5, '2024-12-25 20:04:04', 'validated', 19.30, NULL),
-(8, 18, '2024-12-25 23:54:00', 'validated', 10.70, NULL);
+(8, 18, '2024-12-25 23:54:00', 'validated', 10.70, NULL),
+(9, 5, '2025-01-30 15:31:59', 'validated', 8.80, NULL),
+(10, 20, '2025-01-30 15:39:52', 'delivered', 15.60, NULL),
+(11, 20, '2025-01-30 16:03:01', 'validated', 9.70, NULL),
+(12, 20, '2025-01-30 16:09:54', 'validated', 13.30, NULL),
+(13, 5, '2025-01-31 08:17:41', 'validated', 17.80, NULL),
+(14, 5, '2025-01-31 14:50:25', 'in progress', 3.00, NULL);
 
 -- --------------------------------------------------------
 
@@ -186,7 +207,6 @@ INSERT INTO `products` (`product_id`, `name`, `volume_per_bottle`, `description`
 (2, 'Perrier Sparkling Water', 0.75, 'Refreshing sparkling water.', 'perrier_0_75l.png', 1.80, 200, '2024-12-15 17:41:37', '2024-12-18 11:18:25'),
 (3, 'Volvic Lemon Water', 0.50, 'Still water with a lemon flavor.', 'volvic_citron_0_5l.jpg', 1.20, 150, '2024-12-15 17:41:37', '2024-12-18 11:18:25'),
 (4, '6-Pack of Evian', 1.50, 'Pack of 6 Evian still water bottles.', 'evian_6_pack_1_5l.jpg', 8.50, 50, '2024-12-15 17:41:37', '2024-12-18 11:18:25'),
-(5, '6-Pack of Perrier', 1.00, 'Pack of 6 Perrier sparkling water bottles.', 'perrier_6_pack_1l.jpg', 10.50, 0, '2024-12-15 17:41:37', '2024-12-23 11:10:18'),
 (6, 'Fiji Natural Water', 0.50, 'Smooth-tasting water from Fiji.', 'fiji_500ml.png', 2.00, 150, '2024-12-23 13:54:26', '2024-12-24 16:15:24'),
 (7, 'Fiji Natural Water', 1.00, 'Smooth-tasting water from Fiji.', 'fiji_1l.png', 3.50, 100, '2024-12-23 13:54:26', '2024-12-24 16:15:29'),
 (8, 'Smartwater Distilled', 0.50, 'Distilled water with electrolytes.', 'smartwater_500ml.png', 1.80, 200, '2024-12-23 13:54:26', '2024-12-24 16:15:33'),
@@ -230,7 +250,6 @@ INSERT INTO `productsbrands` (`product_id`, `brand_id`) VALUES
 (13, 1),
 (24, 1),
 (2, 2),
-(5, 2),
 (14, 2),
 (15, 2),
 (25, 2),
@@ -351,7 +370,9 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `email`, `phone_number`, `address`, `city`, `postal_code`, `country`, `password`, `role`, `created_at`, `updated_at`) VALUES
 (5, 'Max', 'Villame', 'max.vil@gmail.com', '0649456547', '15 Rue Ducis', 'Versailles', '78000', 'France', '863a7376103ff66a0ba5af8dc04ee2e2e93c47bd09444c133bcb10ff91c3926e', 'admin', '2024-12-13 16:05:50', '2024-12-25 20:06:42'),
-(18, 'mathis', 'smet', 'mathis.smet@gmail.com', '0645546547', '15 rue ducis', 'Paris', '75001', 'France', '4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5', 'customer', '2024-12-25 23:43:36', '2024-12-25 23:53:45');
+(18, 'mathis', 'smet', 'mathis.smet@gmail.com', '0645546547', '15 rue ducis', 'Paris', '75001', 'France', '4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5', 'customer', '2024-12-25 23:43:36', '2024-12-25 23:53:45'),
+(19, 'admin', 'admin', 'admin@gmail.com', NULL, NULL, NULL, NULL, NULL, '55577026010ae12c7d866336077b17bb3db4e71df759864a8e7417b183044fc9', 'admin', '2025-01-30 15:37:57', '2025-01-30 15:38:44'),
+(20, 'Martin', 'Dupont', 'martin.dupont@outlook.com', NULL, '11 Faubourg saint honorer', 'Paris', '78000', 'France', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'customer', '2025-01-30 15:39:34', '2025-01-30 15:40:25');
 
 --
 -- Index pour les tables déchargées
@@ -438,19 +459,19 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT pour la table `invoices`
 --
 ALTER TABLE `invoices`
-  MODIFY `invoice_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `invoice_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT pour la table `orderitems`
 --
 ALTER TABLE `orderitems`
-  MODIFY `order_item_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `order_item_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT pour la table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT pour la table `products`
@@ -462,7 +483,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- Contraintes pour les tables déchargées

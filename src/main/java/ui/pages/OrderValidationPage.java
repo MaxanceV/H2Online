@@ -24,9 +24,21 @@ import tools.CartUtils;
 import tools.NotificationUtils;
 import tools.SessionManager;
 
+/**
+ * Represents the order validation page, where users can confirm their address
+ * details, choose a payment method, and validate an order. If products are not
+ * fully available, the order is adjusted before confirmation.
+ */
 public class OrderValidationPage {
     private BorderPane layout;
 
+    /**
+     * Constructs an {@code OrderValidationPage} for the specified {@link Order}.
+     * Allows the user to update address fields, choose a payment method, and
+     * validate the order.
+     *
+     * @param order The order to be validated.
+     */
     public OrderValidationPage(Order order) {
         layout = new BorderPane();
 
@@ -81,13 +93,18 @@ public class OrderValidationPage {
 
         Button backToCartButton = new Button("Back to Cart");
         backToCartButton.setStyle("-fx-background-color: gray; -fx-text-fill: white;");
-        backToCartButton.setOnAction(e -> {
-            SessionManager.getMainLayout().setContent(new CartPage().getView());
-        });
+        backToCartButton.setOnAction(e -> SessionManager.getMainLayout().setContent(new CartPage().getView()));
 
         Button validateButton = new Button("Validate Order");
         validateButton.setStyle("-fx-background-color: green; -fx-text-fill: white;");
-        validateButton.setOnAction(e -> validateOrder(order, streetField.getText(), cityField.getText(), postalCodeField.getText(), countryField.getText(), paymentGroup));
+        validateButton.setOnAction(e -> validateOrder(
+                order,
+                streetField.getText(),
+                cityField.getText(),
+                postalCodeField.getText(),
+                countryField.getText(),
+                paymentGroup
+        ));
 
         buttonBox.getChildren().addAll(backToCartButton, validateButton);
 
@@ -101,13 +118,42 @@ public class OrderValidationPage {
         layout.setCenter(contentBox);
     }
 
+    /**
+     * Retrieves the {@link BorderPane} containing the order validation layout.
+     *
+     * @return The root layout for this page.
+     */
     public BorderPane getView() {
         return layout;
     }
 
-    private void validateOrder(Order order, String street, String city, String postalCode, String countryField, ToggleGroup paymentGroup) {
+    /**
+     * Validates the order by checking product availability, updating user address
+     * details in the database, marking the order status as validated, generating
+     * an invoice, and clearing the cart badge. If there is insufficient stock for
+     * any product, the user is notified and the cart page is displayed again.
+     *
+     * @param order The order to validate.
+     * @param street The street address for delivery.
+     * @param city The city for delivery.
+     * @param postalCode The postal code for delivery.
+     * @param countryField The country for delivery.
+     * @param paymentGroup The {@link ToggleGroup} containing the selected payment method.
+     */
+    private void validateOrder(
+            Order order,
+            String street,
+            String city,
+            String postalCode,
+            String countryField,
+            ToggleGroup paymentGroup
+    ) {
         if (street.isEmpty() || city.isEmpty() || postalCode.isEmpty() || countryField.isEmpty()) {
-            NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(), "Please complete all address fields.", false);
+            NotificationUtils.showNotification(
+                    SessionManager.getMainLayout().getRootPane(),
+                    "Please complete all address fields.",
+                    false
+            );
             return;
         }
 
@@ -115,10 +161,12 @@ public class OrderValidationPage {
 
         try {
             boolean isCartValid = CartUtils.checkProductAvailability(order);
-
             if (!isCartValid) {
-                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
-                        "Some products are unavailable. Please review your cart.", false);
+                NotificationUtils.showNotification(
+                        SessionManager.getMainLayout().getRootPane(),
+                        "Some products are unavailable. Please review your cart.",
+                        false
+                );
                 SessionManager.getMainLayout().setContent(new CartPage().getView());
                 return;
             }
@@ -139,18 +187,25 @@ public class OrderValidationPage {
                     .stream()
                     .map(OrderItem::getSubtotalPrice)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
+
             new InvoiceSQL().generateInvoice(order.getOrderId(), totalAmount);
 
             SessionManager.getMainLayout().updateCartBadge(0);
 
-            NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
-                    "Order validated and invoice generated successfully!", true);
+            NotificationUtils.showNotification(
+                    SessionManager.getMainLayout().getRootPane(),
+                    "Order validated and invoice generated successfully!",
+                    true
+            );
 
             SessionManager.getMainLayout().setContent(new OrderHistoryPage().getView());
         } catch (SQLException ex) {
             ex.printStackTrace();
-            NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
-                    "An error occurred while validating the order.", false);
+            NotificationUtils.showNotification(
+                    SessionManager.getMainLayout().getRootPane(),
+                    "An error occurred while validating the order.",
+                    false
+            );
         }
     }
 }

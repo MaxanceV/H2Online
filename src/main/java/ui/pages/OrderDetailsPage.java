@@ -24,10 +24,19 @@ import sqlbdd.ProductSQL;
 import sqlbdd.UserSQL;
 import tools.SessionManager;
 
+/**
+ * Displays the details of a specific order, including customer information and
+ * the items within the order.
+ */
 public class OrderDetailsPage {
     private BorderPane layout;
     private Order order;
 
+    /**
+     * Constructs an {@code OrderDetailsPage} for the specified {@link Order}.
+     *
+     * @param order The order whose details are to be displayed.
+     */
     public OrderDetailsPage(Order order) {
         this.order = order;
         layout = new BorderPane();
@@ -44,10 +53,21 @@ public class OrderDetailsPage {
         layout.setBottom(createFooterButtons());
     }
 
+    /**
+     * Retrieves the main layout containing the order details.
+     *
+     * @return The {@link BorderPane} for the order details page.
+     */
     public BorderPane getView() {
         return layout;
     }
 
+    /**
+     * Creates a section displaying customer information such as name, email, phone,
+     * address, order status, and total amount.
+     *
+     * @return A {@link VBox} containing the customer's information.
+     */
     private VBox createCustomerInfoSection() {
         VBox customerInfoBox = new VBox(10);
         customerInfoBox.setPadding(new Insets(10));
@@ -60,8 +80,8 @@ public class OrderDetailsPage {
             Label customerNameLabel = new Label("Customer: " + user.getFirstName() + " " + user.getLastName());
             Label emailLabel = new Label("Email: " + user.getEmail());
             Label phoneLabel = new Label("Phone: " + (user.getPhoneNumber() != null ? user.getPhoneNumber() : "N/A"));
-            Label addressLabel = new Label("Address: " + user.getAddress() + ", " + user.getCity() + ", " +
-                    user.getPostalCode() + ", " + user.getCountry());
+            Label addressLabel = new Label("Address: " + user.getAddress() + ", " + user.getCity() + ", "
+                    + user.getPostalCode() + ", " + user.getCountry());
             Label statusLabel = new Label("Status: " + order.getStatus());
             Label totalLabel = new Label("Total Amount: €" + order.getTotalPrice());
 
@@ -75,6 +95,12 @@ public class OrderDetailsPage {
         return customerInfoBox;
     }
 
+    /**
+     * Creates a {@link TableView} displaying the items in the order, including
+     * product name, quantity, unit price, and subtotal.
+     *
+     * @return A table view containing the order's item details.
+     */
     private TableView<OrderItemRow> createOrderItemsTable() {
         TableView<OrderItemRow> tableView = new TableView<>();
 
@@ -97,6 +123,12 @@ public class OrderDetailsPage {
         return tableView;
     }
 
+    /**
+     * Loads the items belonging to the current order from the database and populates
+     * the provided table with the relevant product details.
+     *
+     * @param tableView The table view to populate with order items.
+     */
     private void loadOrderItems(TableView<OrderItemRow> tableView) {
         try {
             OrderItemSQL orderItemDAO = new OrderItemSQL();
@@ -106,8 +138,12 @@ public class OrderDetailsPage {
             List<OrderItemRow> rows = orderItems.stream().map(orderItem -> {
                 try {
                     Product product = productDAO.getProductById(orderItem.getProductId());
-                    return new OrderItemRow(product.getName(), orderItem.getQuantity(),
-                            orderItem.getUnitPrice(), orderItem.getSubtotalPrice());
+                    return new OrderItemRow(
+                            product.getName(),
+                            orderItem.getQuantity(),
+                            orderItem.getUnitPrice(),
+                            orderItem.getSubtotalPrice()
+                    );
                 } catch (SQLException e) {
                     e.printStackTrace();
                     return null;
@@ -120,6 +156,12 @@ public class OrderDetailsPage {
         }
     }
 
+    /**
+     * Creates a footer containing navigational buttons for the order details page.
+     * Currently includes a back button to return to the {@link ManageOrdersPage}.
+     *
+     * @return An {@link HBox} containing the footer buttons.
+     */
     private HBox createFooterButtons() {
         HBox footerBox = new HBox(10);
         footerBox.setAlignment(Pos.CENTER);
@@ -134,12 +176,24 @@ public class OrderDetailsPage {
         return footerBox;
     }
 
+    /**
+     * Represents a row in the order items table, containing the product name,
+     * quantity, unit price, and subtotal.
+     */
     public static class OrderItemRow {
         private final StringProperty productName;
         private final StringProperty quantity;
         private final StringProperty unitPrice;
         private final StringProperty subtotalPrice;
 
+        /**
+         * Constructs an {@link OrderItemRow} with the specified product details.
+         *
+         * @param productName   The name of the product.
+         * @param quantity      The quantity of the product ordered.
+         * @param unitPrice     The unit price of the product.
+         * @param subtotalPrice The subtotal amount for the product.
+         */
         public OrderItemRow(String productName, int quantity, BigDecimal unitPrice, BigDecimal subtotalPrice) {
             this.productName = new SimpleStringProperty(productName);
             this.quantity = new SimpleStringProperty(String.valueOf(quantity));
@@ -147,18 +201,30 @@ public class OrderDetailsPage {
             this.subtotalPrice = new SimpleStringProperty(subtotalPrice.toString());
         }
 
+        /**
+         * @return A {@link StringProperty} representing the product name.
+         */
         public StringProperty productNameProperty() {
             return productName;
         }
 
+        /**
+         * @return A {@link StringProperty} representing the quantity.
+         */
         public StringProperty quantityProperty() {
             return quantity;
         }
 
+        /**
+         * @return A {@link StringProperty} representing the unit price.
+         */
         public StringProperty unitPriceProperty() {
             return unitPrice;
         }
 
+        /**
+         * @return A {@link StringProperty} representing the subtotal price.
+         */
         public StringProperty subtotalPriceProperty() {
             return subtotalPrice;
         }

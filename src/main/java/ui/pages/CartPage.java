@@ -2,11 +2,7 @@ package ui.pages;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -26,18 +22,35 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Represents a cart page, displaying the user's in-progress order (if any),
+ * item details, and options to modify or remove items.
+ */
 public class CartPage {
     private BorderPane layout;
 
+    /**
+     * Constructs a {@code CartPage} and populates the cart content.
+     */
     public CartPage() {
         layout = new BorderPane();
         populateCartContent();
     }
 
+    /**
+     * Retrieves the root {@link BorderPane} for this page.
+     *
+     * @return The main layout for the cart page.
+     */
     public BorderPane getView() {
         return layout;
     }
 
+    /**
+     * Populates the cart with items belonging to the in-progress order for the
+     * currently logged-in user. If no in-progress order exists, displays a message
+     * indicating the cart is empty.
+     */
     private void populateCartContent() {
         int userId = SessionManager.getCurrentUser().getId();
         OrderSQL orderDAO = new OrderSQL();
@@ -67,7 +80,7 @@ public class CartPage {
 
             ScrollPane scrollPane = new ScrollPane(cartItemsBox);
             scrollPane.setFitToWidth(true);
-            scrollPane.setFitToHeight(true); 
+            scrollPane.setFitToHeight(true);
             layout.setLeft(scrollPane);
 
             VBox totalBox = createTotalSummaryBox(inProgressOrder, orderItemDAO);
@@ -78,6 +91,17 @@ public class CartPage {
         }
     }
 
+    /**
+     * Creates a row in the cart for a given order item, displaying the product
+     * image, description, quantity spinner, subtotal, and a delete button.
+     *
+     * @param item          The {@link OrderItem} to display.
+     * @param orderItemDAO  The DAO for managing order items.
+     * @param orderDAO      The DAO for managing orders.
+     * @return A {@link HBox} representing one row in the cart item list.
+     * @throws SQLException If an error occurs while retrieving product details or
+     *                      if the product is not found.
+     */
     private HBox createCartItemRow(OrderItem item, OrderItemSQL orderItemDAO, OrderSQL orderDAO) throws SQLException {
         HBox itemRow = new HBox(15);
         itemRow.setAlignment(Pos.CENTER_LEFT);
@@ -115,7 +139,8 @@ public class CartPage {
 
         Label quantityLabel = new Label("Quantity:");
         Spinner<Integer> quantitySpinner = new Spinner<>();
-        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, product.getStockQuantity(), item.getQuantity());
+        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                1, product.getStockQuantity(), item.getQuantity());
         quantitySpinner.setValueFactory(valueFactory);
         quantitySpinner.setMaxWidth(70);
 
@@ -153,11 +178,13 @@ public class CartPage {
         deleteButton.setOnAction(e -> {
             try {
                 orderItemDAO.deleteOrderItem(item.getOrderItemId());
-                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(), "Item removed from cart!", true);
+                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
+                        "Item removed from cart!", true);
                 populateCartContent();
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(), "Failed to remove item from cart!", false);
+                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
+                        "Failed to remove item from cart!", false);
             }
         });
 
@@ -165,6 +192,15 @@ public class CartPage {
         return itemRow;
     }
 
+    /**
+     * Creates a summary box for the current order's total. Includes a label showing
+     * the total amount and a button to validate and pay for the order.
+     *
+     * @param inProgressOrder The user's in-progress order.
+     * @param orderItemDAO    The DAO for managing order items.
+     * @return A {@link VBox} displaying the total amount and a validation button.
+     * @throws SQLException If an error occurs while calculating the total.
+     */
     private VBox createTotalSummaryBox(Order inProgressOrder, OrderItemSQL orderItemDAO) throws SQLException {
         VBox totalBox = new VBox(10);
         totalBox.setAlignment(Pos.TOP_RIGHT);
@@ -185,7 +221,8 @@ public class CartPage {
                 SessionManager.getMainLayout().setContent(new OrderValidationPage(inProgressOrder).getView());
             } catch (Exception ex) {
                 ex.printStackTrace();
-                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(), "An error occurred while redirecting to validation page!", false);
+                NotificationUtils.showNotification(SessionManager.getMainLayout().getRootPane(),
+                        "An error occurred while redirecting to validation page!", false);
             }
         });
 

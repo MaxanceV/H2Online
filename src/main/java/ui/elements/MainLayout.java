@@ -29,6 +29,11 @@ import ui.pages.ManageUsersPage;
 import ui.pages.OrderHistoryPage;
 import ui.pages.UserSettingsPage;
 
+/**
+ * Represents the main layout of the H2Online application, which includes a header,
+ * footer, and a central content area. The header contains navigation and cart
+ * badges, while the footer provides branding information.
+ */
 public class MainLayout {
     private StackPane rootPane;
     private BorderPane root;
@@ -39,6 +44,12 @@ public class MainLayout {
     private Label catalogButton;
     private Text cartBadge;
 
+    /**
+     * Constructs the {@code MainLayout} for the provided {@link Stage}, initializing
+     * the header, footer, and scene.
+     *
+     * @param primaryStage The primary stage used to display the layout.
+     */
     public MainLayout(Stage primaryStage) {
         rootPane = new StackPane();
         root = new BorderPane();
@@ -50,6 +61,13 @@ public class MainLayout {
         scene = new Scene(rootPane, 800, 600);
     }
 
+    /**
+     * Creates the application header, including the logo, site name, navigation
+     * controls (catalog, cart, profile menu, and admin menu) and attaches it to
+     * the top of the layout.
+     *
+     * @param primaryStage The primary stage for the application.
+     */
     private void createHeader(Stage primaryStage) {
         BorderPane header = new BorderPane();
         header.setStyle("-fx-background-color: #333333; -fx-padding: 5;");
@@ -121,12 +139,12 @@ public class MainLayout {
 
         MenuItem manageOrders = new MenuItem("Manage Orders");
         manageOrders.setOnAction(e -> {
-        	setContent(new ManageOrdersPage().getView());
+            setContent(new ManageOrdersPage().getView());
         });
 
         MenuItem manageProducts = new MenuItem("Manage Products");
         manageProducts.setOnAction(e -> {
-        	setContent(new ManageProductsPage().getView());
+            setContent(new ManageProductsPage().getView());
         });
 
         MenuItem manageUsers = new MenuItem("Manage Users");
@@ -145,6 +163,10 @@ public class MainLayout {
         root.setTop(header);
     }
 
+    /**
+     * Creates the application footer with branding information and attaches it
+     * to the bottom of the layout.
+     */
     private void createFooter() {
         HBox footer = new HBox();
         footer.setAlignment(Pos.CENTER);
@@ -157,6 +179,10 @@ public class MainLayout {
         root.setBottom(footer);
     }
 
+    /**
+     * Enables the navigation menu and cart functionality, including the profile
+     * menu and cart icon. If the user is an administrator, shows the admin tasks.
+     */
     public void enableMenu() {
         profileMenuButton.setDisable(false);
         profileMenuButton.setVisible(true);
@@ -170,26 +196,51 @@ public class MainLayout {
         }
     }
 
+    /**
+     * Disables the navigation menu and cart functionality, hiding the profile
+     * menu, cart icon, and admin tasks menu.
+     */
     public void disableMenu() {
         profileMenuButton.setDisable(true);
         profileMenuButton.setVisible(false);
         cartButton.setVisible(false);
         catalogButton.setVisible(false);
-        adminMenuButton.setVisible(false); 
+        adminMenuButton.setVisible(false);
     }
 
+    /**
+     * Sets the main content area of the layout to the specified {@link Node}.
+     *
+     * @param content The node to display in the center of the layout.
+     */
     public void setContent(Node content) {
         root.setCenter(content);
     }
 
+    /**
+     * Gets the JavaFX scene associated with this layout.
+     *
+     * @return The {@link Scene} containing this layout.
+     */
     public Scene getScene() {
         return scene;
     }
 
+    /**
+     * Gets the root {@link StackPane} of this layout.
+     *
+     * @return The root stack pane.
+     */
     public StackPane getRootPane() {
         return rootPane;
     }
 
+    /**
+     * Updates the cart badge (item count in the cart) displayed on the cart icon.
+     * If there are no items in the cart, hides the badge.
+     *
+     * @param itemCount The total number of items in the cart.
+     */
     public void updateCartBadge(int itemCount) {
         if (itemCount > 0) {
             cartBadge.setText(String.valueOf(itemCount));
@@ -199,6 +250,10 @@ public class MainLayout {
         }
     }
 
+    /**
+     * Initializes the cart badge by retrieving the current in-progress order for
+     * the logged-in user and calculating the total items in the cart.
+     */
     private void initializeCartBadge() {
         int userId = SessionManager.getCurrentUser().getId();
         OrderSQL orderDAO = new OrderSQL();

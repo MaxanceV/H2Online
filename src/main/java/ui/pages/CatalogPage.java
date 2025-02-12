@@ -17,12 +17,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a catalog page that displays products in a FlowPane. Provides
+ * filtering functionality via a {@link CatalogFilter} and updates the displayed
+ * products accordingly.
+ */
 public class CatalogPage {
     private BorderPane view;
     private FlowPane productPane;
     private CatalogFilter catalogFilter;
-    private ScrollPane scrollPane; 
+    private ScrollPane scrollPane;
 
+    /**
+     * Constructs the {@code CatalogPage}, initializing the layout,
+     * {@link CatalogFilter}, and loading the products to display.
+     */
     public CatalogPage() {
         view = new BorderPane();
 
@@ -32,9 +41,9 @@ public class CatalogPage {
 
         scrollPane = new ScrollPane(productPane);
         scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true); 
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); 
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); 
+        scrollPane.setFitToHeight(true);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
         catalogFilter = new CatalogFilter();
         catalogFilter.getApplyFiltersButton().setOnAction(e -> applyFilters());
@@ -43,13 +52,22 @@ public class CatalogPage {
         loadProducts();
 
         view.setCenter(scrollPane);
-        view.setLeft(catalogFilter.getView()); 
+        view.setLeft(catalogFilter.getView());
     }
 
+    /**
+     * Retrieves the main layout for this page.
+     *
+     * @return The {@link BorderPane} containing the catalog layout.
+     */
     public BorderPane getView() {
         return view;
     }
 
+    /**
+     * Loads all products from the database, retrieves their associated brands and
+     * categories, and displays them in the {@link FlowPane} as {@link ProductCard}s.
+     */
     private void loadProducts() {
         productPane.getChildren().clear();
         ProductSQL productDAO = new ProductSQL();
@@ -59,14 +77,14 @@ public class CatalogPage {
         try {
             List<Product> products = productDAO.getAllProducts();
 
-            // Préparer une liste des IDs de produits pour récupérer leurs marques et catégories
+            // Prepare a list of product IDs to retrieve brands and categories
             List<Integer> productIds = products.stream().map(Product::getProductId).collect(Collectors.toList());
 
-            // Récupérer les marques et catégories pour les produits
+            // Retrieve the brands and categories for the products
             Map<Integer, List<String>> brandsByProduct = brandDAO.getBrandsForProducts(productIds);
             Map<Integer, List<String>> categoriesByProduct = categoryDAO.getCategoriesForProducts(productIds);
 
-            // Ajouter les marques et catégories aux objets produits
+            // Set the brands and categories on each product and add to the UI
             for (Product product : products) {
                 product.setBrands(brandsByProduct.getOrDefault(product.getProductId(), Collections.emptyList()));
                 product.setCategories(categoriesByProduct.getOrDefault(product.getProductId(), Collections.emptyList()));
@@ -79,6 +97,10 @@ public class CatalogPage {
         }
     }
 
+    /**
+     * Applies the filters specified in the {@link CatalogFilter} to the products,
+     * and updates the {@link FlowPane} to display only matching items.
+     */
     private void applyFilters() {
         String searchQuery = catalogFilter.getSearchQuery();
         List<String> selectedBrands = catalogFilter.getSelectedBrands();
@@ -88,7 +110,6 @@ public class CatalogPage {
         double minVolume = catalogFilter.getMinVolume();
         double maxVolume = catalogFilter.getMaxVolume();
 
-
         productPane.getChildren().clear();
         ProductSQL productDAO = new ProductSQL();
         BrandSQL brandDAO = new BrandSQL();
@@ -97,7 +118,7 @@ public class CatalogPage {
         try {
             List<Product> products = productDAO.getAllProducts();
 
-            // Charger les marques et catégories pour les produits
+            // Load brands and categories for the products
             List<Integer> productIds = products.stream().map(Product::getProductId).collect(Collectors.toList());
             Map<Integer, List<String>> brandsByProduct = brandDAO.getBrandsForProducts(productIds);
             Map<Integer, List<String>> categoriesByProduct = categoryDAO.getCategoriesForProducts(productIds);
@@ -106,7 +127,8 @@ public class CatalogPage {
                 product.setBrands(brandsByProduct.getOrDefault(product.getProductId(), new ArrayList<>()));
                 product.setCategories(categoriesByProduct.getOrDefault(product.getProductId(), new ArrayList<>()));
 
-                if (isProductMatchingFilters(product, searchQuery, selectedBrands, selectedCategories, minPrice, maxPrice, minVolume, maxVolume)) {
+                if (isProductMatchingFilters(product, searchQuery, selectedBrands, selectedCategories,
+                                             minPrice, maxPrice, minVolume, maxVolume)) {
                     ProductCard card = new ProductCard(product);
                     productPane.getChildren().add(card);
                 }
@@ -116,7 +138,30 @@ public class CatalogPage {
         }
     }
 
-    private boolean isProductMatchingFilters(Product product, String searchQuery, List<String> selectedBrands, List<String> selectedCategories, double minPrice, double maxPrice, double minVolume, double maxVolume) {
+    /**
+     * Determines whether a product matches the given filter criteria for search query,
+     * selected brands, selected categories, price range, and volume range.
+     *
+     * @param product The product to test against the filter criteria.
+     * @param searchQuery The search text to filter by name or description.
+     * @param selectedBrands The list of selected brand names.
+     * @param selectedCategories The list of selected category names.
+     * @param minPrice The minimum price to filter.
+     * @param maxPrice The maximum price to filter.
+     * @param minVolume The minimum volume to filter.
+     * @param maxVolume The maximum volume to filter.
+     * @return True if the product matches all the specified filters; false otherwise.
+     */
+    private boolean isProductMatchingFilters(
+            Product product,
+            String searchQuery,
+            List<String> selectedBrands,
+            List<String> selectedCategories,
+            double minPrice,
+            double maxPrice,
+            double minVolume,
+            double maxVolume
+    ) {
         boolean matchesSearch = searchQuery == null || searchQuery.isEmpty() ||
                 product.getName().toLowerCase().contains(searchQuery.toLowerCase()) ||
                 product.getDescription().toLowerCase().contains(searchQuery.toLowerCase());
@@ -127,11 +172,12 @@ public class CatalogPage {
         boolean matchesCategory = selectedCategories.isEmpty() ||
                 product.getCategories().stream().anyMatch(selectedCategories::contains);
 
-        boolean matchesPrice = product.getPrice().doubleValue() >= minPrice && product.getPrice().doubleValue() <= maxPrice;
+        boolean matchesPrice = product.getPrice().doubleValue() >= minPrice
+                               && product.getPrice().doubleValue() <= maxPrice;
 
-        boolean matchesVolume = product.getVolumePerBottle().doubleValue() >= minVolume && product.getVolumePerBottle().doubleValue() <= maxVolume;
+        boolean matchesVolume = product.getVolumePerBottle().doubleValue() >= minVolume
+                                && product.getVolumePerBottle().doubleValue() <= maxVolume;
 
         return matchesSearch && matchesBrand && matchesCategory && matchesPrice && matchesVolume;
     }
-
 }
